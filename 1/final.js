@@ -97,23 +97,25 @@ var init = function() {
 	// Globals for title screen
 	var arrowPosition = 280,
 		helpText = "Press ENTER to select.";
-
+	var flicker = 0;
 	function titleScreen() {
 
 		//This is the title, in which people will choose from seperate options.
 		titleSetControls();
 		//rendered screen
 
-		ctx.fillStyle = "#141414";
+		ctx.fillStyle = "#181818";
 		ctx.fillRect(0,0, canvas.width, canvas.height);
 		ctx.font ='normal 14px PressStart2P';
 		ctx.fillStyle = "#208cb0";
 
 		ctx.drawImage(title_logo1, 320, 180);
 
-		ctx.fillStyle = "#8f8f8f";
+		flicker++;
+		if (flicker%5==0) {ctx.fillStyle = "#8f8f8f"; flicker=0}
+		else { ctx.fillStyle = "#2040aa";}
 		ctx.fillText("█", arrowPosition, 376);
-		ctx.fillStyle = "#208cb0";
+		ctx.fillStyle = "#2040aa";
 
 		ctx.fillText("start", 300, 380);
 		ctx.fillText("about", 400, 380);
