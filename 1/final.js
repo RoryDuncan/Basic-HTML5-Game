@@ -1,11 +1,4 @@
-var checkState = function() {
-	if (document.readyState === "complete") { init(); }
-};
-
-var loadPage = setInterval(checkState, 5);
-
 var init = function() {
-	clearInterval(loadPage);
 	console.log("Initializing.");
 
 
@@ -238,3 +231,5 @@ var init = function() {
 	drawScreen();
 
 }; // end of init()
+
+document.addEventListener('DOMContentLoaded', init, false);
