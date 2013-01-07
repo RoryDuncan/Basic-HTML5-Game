@@ -161,15 +161,15 @@ var init = function() {
 	map.height = 128;
 	map.width = 128;
 	var tiles = 0;
-	Tile = function(number, xpos, ypos, indx) {
-		tiles += 1;
+	Tile = function(number, xpos, indx) {
 		this.id = number;
-		this.x = xpos;
-		this.y = ypos;
+		this.x = ~~(tiles%map.width) * map.tileSize;
+		this.y = ~~(number/128) * map.tileSize;
 		if (indx === 0 || indx === 1 || indx === 2 || indx === 3 || indx === 4 ) {
 			this.image = indx;
 		}
 		else { this.image = ~~(Math.random() * 4); }
+		tiles += 1;
 	};
 	map.data = new Array();
 	map.tileSize = 50;
@@ -178,24 +178,18 @@ var init = function() {
 	map.makeMap = function() {
 		// y axis is spine, x axis is filled
 		map.data = [];
-		document.body.style.cursor = "";
+
+		document.body.style.cursor = "progress";
 		loadingText = "Loading Map Data";
-		for (var y = 0; y <= map.height - 1; y += 1) {
-			// X axis
-			for (var x = 0; x <= map.width - 1; x += 1) {
-				var data = new Tile(tiles, x * map.tileSize, y * map.tileSize);
-				console.log(data);
-				map.data.push(data);
-				/* 
-				I learned that 
-				map.data[anything].push(stuff)
-				is not allowed, while
-				map.data.push(stuff) is.
-				*/
-			}
+		
+		for (var c = 0; c < (map.height*map.width); c += 1) {
+			var data = new Tile(tiles, c * map.tileSize);
+			console.log(data);
+			map.data.push(data);
 		}
 		map.made = true;
 		loadingText = "Map Data Finished.";
+		document.body.style.cursor = "default";
 	};
 
 	var loadingText = "Loading...",
@@ -203,7 +197,7 @@ var init = function() {
 
 	function loadGame() {
 		//loadGame = Function("");
-		ctx.fillStyle = "#141414";
+		ctx.fillStyle = "#181818";
 		ctx.fillRect(0,0, canvas.width, canvas.height);
 		ctx.font = "normal 14px PressStart2P";
 		ctx.fillStyle = "#8f8f8f";
@@ -219,7 +213,7 @@ var init = function() {
 			ctx.fillStyle = "#292";
 		}
 
-		ctx.fillText(loadingText, 400, 400);
+		ctx.fillText(loadingText, 350, 400);
 
 		if (map.made === false) {
 			map.makeMap();
