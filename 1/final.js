@@ -117,6 +117,17 @@ var init = function() {
 		};
 
 	var screen = new Object();
+
+		/****** NOTES **********
+		the screen is 1050 wide, 750 high. the 50 is added to make a center tile possible
+		+	Horizontal tiles: 1050 / 50 = 21
+		+	Vertical tiles: 750 / 50 = 15
+
+		At any time, the x of the tile can be achieved via the tile's id % 128.
+		At any time, the y of the tile can be achieved via the tile's id / 128.
+
+
+		************************/
 		/* screen.location may need to be changed, since it will be referred to often. */
 		screen.location = (map.made === true) ? map.data[player.isOnTile].id : 0; 
 
@@ -261,6 +272,7 @@ var init = function() {
 			map.makeMap();
 		}
 		player.spawn();
+		console.log(map.data);
 		
 
 	}; //end of loadGame
