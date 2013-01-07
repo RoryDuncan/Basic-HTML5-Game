@@ -9,8 +9,8 @@ var init = function() {
 			ctx = canvas.getContext("2d"),
  			W = window.screen.availWidth,
 			H = window.screen.availHeight;
-	canvas.height = 700;
-	canvas.width = 1000;
+	canvas.height = 750;
+	canvas.width = 1050;
 	var gameMode = 0; //game modes: 0=title, 1 = loading, 2 = gameplay, 3 = game menu 
 	console.log("Initialized.");
 
@@ -53,6 +53,77 @@ var init = function() {
 	title_logo2.addEventListener('load', imageLoad, false);
 
 
+	/****** Colors  ******************************/
+
+	var bgColor = "#181818",
+		lightText = "#8f8f8f",
+		menuText = "#377778";
+
+	/****** Objects  ******************************/
+
+	var map = new Object();
+	map.height = 128;
+	map.width = 128;
+	var tiles = 0, //the area of the map.
+	Tile = function(number, xpos, indx) {
+		this.id = number;
+		this.x = ~~(tiles%map.width) * map.tileSize; // Every 128 tiles, the x is incremented
+		this.y = ~~(number/128) * map.tileSize;		 // Divided by 128 to exhume the Y from the area, 
+		if (indx === 0 || indx === 1 || indx === 2 || indx === 3 || indx === 4 ) {
+			this.image = indx;
+		}
+		else { this.image = ~~(Math.random() * 4); }
+		tiles += 1;
+	 };
+	map.data = new Array();
+	map.tileSize = 50;
+	map.made = false;
+
+	map.makeMap = function() {
+		map.data = [];
+		document.body.style.cursor = "progress";
+		loadingText = "Loading Map Data";
+
+		for (var c = 0; c < (map.height*map.width); c += 1) {
+			var data = new Tile(tiles, c * map.tileSize);
+			//console.log(data);
+			map.data.push(data);
+		}
+		map.made = true;
+		loadingText = "Map Data Finished.";
+		document.body.style.cursor = "default";
+	};
+	map.draw = function() {
+		loadingText = "Drawing Map..";
+		
+	};
+
+
+
+	var player = new Object();
+		player.x = 0;
+		player.y = 0;
+		player.isOnTile = 0;
+		player.spawn = function() {
+			loadingText = "Creating Random Spawn Location...";
+			player.spawn = Function("");									 // this function Only needs to be ran once
+			randomTile = ~~( Math.random() * (map.height * map.width) / 2 ); // first get a random number within the map
+			player.x = map.data[randomTile].x;								 // use the random number as the id of a tile
+			player.y = map.data[randomTile].y;
+			player.isOnTile = map.data[randomTile].id;								 // each tile is an object with an x and a y, assign those.
+			console.log( "Player will spawn at the tile at " + (player.x/50) + ", " + (player.y/50) + ".");
+			console.log(player.isOnTile);
+			loadingText	= "Player spawn set.";
+		};
+
+	var screen = new Object();
+		/* screen.location may need to be changed, since it will be referred to often. */
+		screen.location = (map.made === true) ? map.data[player.isOnTile].id : 0; 
+
+
+	/****** Content  ******************************/
+
+
 	function imageLoad() {
 		imagesLoaded += 1;
 
@@ -74,18 +145,19 @@ var init = function() {
 				requestAnimFrame(animloop);
 				drawScreen();
 			})();
-		}
-	}; // end of imageLoad()
+		 }
+	 }; // end of imageLoad()
 
 
 	function drawScreen() {
 		if (gameMode === 0) titleScreen();
 		if (gameMode === 1) loadGame();
+		if (gameMode === 2) console.log("game mode 3!");
 	}; // End of drawscreen()
 
 
 	// Globals for title screen
-	var arrowPosition = 280,
+	var arrowPosition = 275,
 		  helpText = "Press ENTER to select.",
 		  flicker = 0;
 	function titleScreen() {
@@ -94,43 +166,46 @@ var init = function() {
 		titleSetControls();
 		//rendered screen
 
-		ctx.fillStyle = "#181818";
+		ctx.fillStyle = bgColor;
 		ctx.fillRect(0,0, canvas.width, canvas.height);
 		ctx.font = "normal 14px PressStart2P";
-		ctx.fillStyle = "#208cb0";
+		ctx.fillStyle = menuText;
 
 		ctx.drawImage(title_logo1, 320, 180);
 
 		flicker += 1;
-		if (flicker % 5 == 0) { ctx.fillStyle = "#8f8f8f"; flicker=0; }
-		else { ctx.fillStyle = "#2040aa"; }
-		ctx.fillText("█", arrowPosition, 376);
-		ctx.fillStyle = "#2040aa";
+		if (flicker % 15 == 0) {
+			ctx.fillStyle = bgColor;
+			flicker=0;
+		}
+		else { ctx.fillStyle = lightText; }
+		ctx.fillText("→", arrowPosition, 380);
+		ctx.fillStyle = menuText;
 
 		ctx.fillText("start", 300, 380);
 		ctx.fillText("about", 400, 380);
 		ctx.fillText("ctrls", 500, 380);
 		ctx.fillText("----", 600, 380);
-		ctx.fillStyle = "#8f8f8f";
+		ctx.fillStyle = lightText;
 		ctx.fillText(helpText, 350, 600);
 
 	}; // end of titleScreen
 
 	function menu_a_button() {
-		if (arrowPosition == 380 || arrowPosition == 480) {
+		if (arrowPosition == 375 || arrowPosition == 475) {
 			helpText = "Press ENTER to select.";
 			arrowPosition -= 100;
 		}
 	};
 
 	function menu_d_button() {
-		if (arrowPosition == 280 || arrowPosition == 380) {
+		if (arrowPosition == 275 || arrowPosition == 375) {
 			helpText = "Press ENTER to select.";
 			arrowPosition += 100;
 		}    
 	};
 	function menu_return_button() { 
-		if (arrowPosition == 280) {
+		if (arrowPosition == 275) {
 			$(document).unbind('keyup.a', menu_a_button);
 			$(document).unbind('keyup.d', menu_d_button);
 			$(document).unbind('keyup.left', menu_a_button);
@@ -138,10 +213,10 @@ var init = function() {
 			$(document).unbind('keyup.return', menu_return_button);
 			gameMode = 1;
 		}
-		else if (arrowPosition == 380) {
+		else if (arrowPosition == 375) {
 			helpText = "Not Implemented Yet.";
 		}
-		else if (arrowPosition == 480) {
+		else if (arrowPosition == 475) {
 			helpText = "Not Implemented Yet.. either.";
 		}
 	};
@@ -157,67 +232,36 @@ var init = function() {
 
 	}; //end of titleSetControls
 
-	var map = new Object();
-	map.height = 128;
-	map.width = 128;
-	var tiles = 0;
-	Tile = function(number, xpos, indx) {
-		this.id = number;
-		this.x = ~~(tiles%map.width) * map.tileSize;
-		this.y = ~~(number/128) * map.tileSize;
-		if (indx === 0 || indx === 1 || indx === 2 || indx === 3 || indx === 4 ) {
-			this.image = indx;
-		}
-		else { this.image = ~~(Math.random() * 4); }
-		tiles += 1;
-	};
-	map.data = new Array();
-	map.tileSize = 50;
-	map.made = false;
 
-	map.makeMap = function() {
-		// y axis is spine, x axis is filled
-		map.data = [];
-
-		document.body.style.cursor = "progress";
-		loadingText = "Loading Map Data";
-		
-		for (var c = 0; c < (map.height*map.width); c += 1) {
-			var data = new Tile(tiles, c * map.tileSize);
-			console.log(data);
-			map.data.push(data);
-		}
-		map.made = true;
-		loadingText = "Map Data Finished.";
-		document.body.style.cursor = "default";
-	};
 
 	var loadingText = "Loading...",
 	loadingColor = 0; //counter for loading screen effect
 
 	function loadGame() {
 		//loadGame = Function("");
-		ctx.fillStyle = "#181818";
+		ctx.fillStyle = bgColor;
 		ctx.fillRect(0,0, canvas.width, canvas.height);
 		ctx.font = "normal 14px PressStart2P";
-		ctx.fillStyle = "#8f8f8f";
+		ctx.fillStyle = lightText;
 		ctx.drawImage(title_logo1, 320, 180);
 
 		//Render of loading Screen
 		if (loadingColor <= 30) {
 			loadingColor += 1;
-			ctx.fillStyle = "#8f8f8f";
+			ctx.fillStyle = lightText;
 		}
 		else {
 			loadingColor = 0;
-			ctx.fillStyle = "#292";
+			ctx.fillStyle = "#ccc";
 		}
 
 		ctx.fillText(loadingText, 350, 400);
 
 		if (map.made === false) {
 			map.makeMap();
-		} else {}
+		}
+		player.spawn();
+		
 
 	}; //end of loadGame
 
