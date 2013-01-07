@@ -1,0 +1,7 @@
+METHOD:
+
+initialization
+
+	drawScreen timer
+	drawBackground timer
+	drawBackground

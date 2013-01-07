@@ -1,0 +1,25 @@
+		scope of final project:
+
+	-Create a sidescrolling character that can be controlled via "WASD" keys.
+
+		assets: 
+			- background images
+
+		Todo:
+			-decide on a visual theme
+			-create images for theme,
+			-create imagemap of images
+			-set up requestAnimFrame and the FPS of the demo
+				-link fps to 'speed'
+
+			background:
+				-layer images and create relative speed
+
+			character:
+				-set up event alerts for WASD
+				-animate character relatively to WASD
+				-create artificial movement based on moving background images relatively
+
+
+STEAMCODE:
+ED5BV-XVJ6V-AL7WL
