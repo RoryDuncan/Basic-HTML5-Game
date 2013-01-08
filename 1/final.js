@@ -83,12 +83,20 @@ var init = function() {
 		map.data = [];
 		document.body.style.cursor = "progress";
 		loadingText = "Loading Map Data";
-
+	myDate = new Date();
 		for (var c = 0; c < (map.height*map.width); c += 1) {
 			var data = new Tile(tiles, c * map.tileSize);
 			//console.log(data);
 			map.data.push(data);
 		}
+		map.data.sort(function(a, b) {
+    	if(a.x < b.x) { return -1; }
+    	else if(a.x > b.x) { return 1; }
+    	else if(a.y < b.y) { return -1; }
+    	else if(a.y > b.y) { return 1; }
+    	else if(a.x == b.x && a.y == b.y) { return 0; }
+  	 });
+	console.log((new Date() - myDate));
 		map.made = true;
 		loadingText = "Map Data Finished.";
 		document.body.style.cursor = "default";
@@ -120,16 +128,16 @@ var init = function() {
 
 		/****** NOTES **********
 		the screen is 1050 wide, 750 high. the 50 is added to make a center tile possible
-		+	Horizontal tiles: 1050 / 50 = 21
-		+	Vertical tiles: 750 / 50 = 15
-
-		At any time, the x of the tile can be achieved via the tile's id % 128.
-		At any time, the y of the tile can be achieved via the tile's id / 128.
+		
+		The x to the left is now one less than the current position, the x to the right is one more
+		the y above is +128 the current array position, the y under is -128
 
 
 		************************/
-		/* screen.location may need to be changed, since it will be referred to often. */
-		screen.location = (map.made === true) ? map.data[player.isOnTile].id : 0; 
+
+		screen.center = (map.made === true) ? map.data[player.isOnTile].id : 0;
+
+
 
 
 	/****** Content  ******************************/
