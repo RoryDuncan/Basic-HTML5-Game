@@ -2,6 +2,8 @@ var init = function() {
 	console.log("Initializing.");
 
 
+
+
 	/*********    SETTINGS    ************/
 
 
@@ -13,6 +15,10 @@ var init = function() {
 	canvas.width = 1050;
 	var gameMode = 0; //game modes: 0=title, 1 = loading, 2 = gameplay, 3 = game menu 
 	console.log("Initialized.");
+
+
+
+
 
 	/*********    Input Events    ************/
 
@@ -27,6 +33,9 @@ var init = function() {
 			y: event.pageY - this.offsetTop
 		}
 	};
+
+
+
 
 	/****** Images  ******************************/
 
@@ -53,11 +62,16 @@ var init = function() {
 	title_logo2.addEventListener('load', imageLoad, false);
 
 
+
+
 	/****** Colors  ******************************/
 
 	var bgColor = "#181818",
 		lightText = "#8f8f8f",
 		menuText = "#377778";
+
+
+
 
 	/****** Objects  ******************************/
 
@@ -65,7 +79,7 @@ var init = function() {
 	map.height = 128;
 	map.width = 128;
 	var tiles = 0, //the area of the map.
-	Tile = function(number, xpos, indx) {
+	Tile = function(number, xpos, indx) { //constructor
 		this.id = number;
 		this.x = ~~(tiles%map.width) * map.tileSize; // Every 128 tiles, the x is incremented
 		this.y = ~~(number/128) * map.tileSize;		 // Divided by 128 to exhume the Y from the area, 
@@ -86,18 +100,20 @@ var init = function() {
 	myDate = new Date();
 		for (var c = 0; c < (map.height*map.width); c += 1) {
 			var data = new Tile(tiles, c * map.tileSize);
-			//console.log(data);
 			map.data.push(data);
 		}
-		map.data.sort(function(a, b) {
+
+		map.data.sort(function(a, b) { //Sorting of the array containing the map tiles.
     	if(a.x < b.x) { return -1; }
     	else if(a.x > b.x) { return 1; }
     	else if(a.y < b.y) { return -1; }
     	else if(a.y > b.y) { return 1; }
     	else if(a.x == b.x && a.y == b.y) { return 0; }
   	 });
-	console.log((new Date() - myDate));
+
+		console.log((new Date() - myDate));
 		map.made = true;
+		screen.center = map.data[player.isOnTile];
 		loadingText = "Map Data Finished.";
 		document.body.style.cursor = "default";
 	};
@@ -135,7 +151,22 @@ var init = function() {
 
 		************************/
 
-		screen.center = (map.made === true) ? map.data[player.isOnTile].id : 0;
+		screen.center =  null;
+		screen.selectAll = [];
+		screen.loadTiles = function(margin) {
+			// the argument margin expands the area. 
+			var topLeftCorner =  map.data[player.isOnTile - ( 10 + margin ) - (128 * ( 7 + margin ) )];
+			var bottomLeftCorner =  map.data[player.isOnTile - ( 10 + margin ) + (128 * ( 7 + margin ) )];
+			var topRightCorner =  map.data[player.isOnTile + ( 10 + margin ) - (128 * ( 7 + margin ) )];
+			var bottomRightCorner =  map.data[player.isOnTile + ( 10 + margin ) + (128*7)];
+			console.log(topLeftCorner.x/50, topLeftCorner.y/50, bottomLeftCorner.x/50, bottomLeftCorner.y/50, topRightCorner.x/50, topRightCorner.y/50, bottomRightCorner.x/50, bottomRightCorner.y/50);
+			/*		Sometimes the X and Y's aren't equal, due to the way the row works.					*/
+			screen.selectAll = [];  // clear screen.selectAll
+			for (y = 0; y <= (7 + margin); y+=1) {
+
+				//screen.selectAll.push(); //this line is incomplete
+			}
+		};
 
 
 
@@ -280,7 +311,7 @@ var init = function() {
 			map.makeMap();
 		}
 		player.spawn();
-		console.log(map.data);
+		screen.loadTiles(0);
 		
 
 	}; //end of loadGame
