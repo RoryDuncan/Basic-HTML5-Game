@@ -81,8 +81,8 @@ var init = function() {
 	var tiles = 0, //the area of the map.
 	Tile = function(number, xpos, indx) { //constructor
 		this.id = number;
-		this.x = ~~(tiles%map.width) * map.tileSize; // Every 128 tiles, the x is incremented
-		this.y = ~~(number/128) * map.tileSize;		 // Divided by 128 to exhume the Y from the area, 
+		this.x = ~~(tiles%map.width); // Every 128 tiles, the x is incremented
+		this.y = ~~(number/128);		 // Divided by 128 to exhume the Y from the area, 
 		if (indx === 0 || indx === 1 || indx === 2 || indx === 3 || indx === 4 ) {
 			this.image = indx;
 		}
@@ -103,12 +103,12 @@ var init = function() {
 			map.data.push(data);
 		}
 
-		map.data.sort(function(a, b) { //Sorting of the array containing the map tiles.
-    	if(a.x < b.x) { return -1; }
-    	else if(a.x > b.x) { return 1; }
-    	else if(a.y < b.y) { return -1; }
-    	else if(a.y > b.y) { return 1; }
-    	else if(a.x == b.x && a.y == b.y) { return 0; }
+		map.data.sort(function(a, b) {//Sorting of the array containing the map tiles. Sorts y, then x
+    if(a.y < b.y) { return -1; }
+    else if(a.y > b.y) { return 1; }
+    else if(a.x < b.x) { return -1; }
+    else if(a.x > b.x) { return 1; }
+    else if(a.x == b.x && a.y == b.y) { return 0; }
   	 });
 
 		console.log((new Date() - myDate));
@@ -135,7 +135,7 @@ var init = function() {
 			player.x = map.data[randomTile].x;								 // use the random number as the id of a tile
 			player.y = map.data[randomTile].y;
 			player.isOnTile = map.data[randomTile].id;								 // each tile is an object with an x and a y, assign those.
-			console.log( "Player will spawn at the tile at " + (player.x/50) + ", " + (player.y/50) + ".");
+			console.log( "Player will spawn at the tile at " + (player.x) + ", " + (player.y) + ".");
 			console.log(player.isOnTile);
 			loadingText	= "Player spawn set.";
 		};
@@ -159,16 +159,28 @@ var init = function() {
 			var bottomLeftCorner =  map.data[player.isOnTile - ( 10 + margin ) + (128 * ( 7 + margin ) )];
 			var topRightCorner =  map.data[player.isOnTile + ( 10 + margin ) - (128 * ( 7 + margin ) )];
 			var bottomRightCorner =  map.data[player.isOnTile + ( 10 + margin ) + (128*7)];
-			console.log(topLeftCorner.x/50, topLeftCorner.y/50, bottomLeftCorner.x/50, bottomLeftCorner.y/50, topRightCorner.x/50, topRightCorner.y/50, bottomRightCorner.x/50, bottomRightCorner.y/50);
-			/*		Sometimes the X and Y's aren't equal, due to the way the row works.					*/
+			/*console.log("Corners: ",
+				topLeftCorner,
+				bottomLeftCorner,
+				topRightCorner,
+				bottomRightCorner
+			); */
+			console.log(map.data[check-5], map.data[check-1], map.data[check], map.data[check+1], map.data[check+5]);
+			/*		Sometimes the X and Y's aren't equal, due to the way the row works.			*/
+			/*	Need to think of a check, as well as a way to adjust values to it.				*/
 			screen.selectAll = [];  // clear screen.selectAll
-			for (y = 0; y <= (7 + margin); y+=1) {
+			for (r = topLeftCorner; r <= bottomLeftCorner; r+=128) {
 
-				//screen.selectAll.push(); //this line is incomplete
+				for (c=topLeftCorner; c <= topRightCorner; c +=1) {
+					var data = map.data[c];
+					//console.log(data);
+					//screen.selectAll.push();
+				}
+
 			}
 		};
 
-
+var check = ~~(Math.random()*(128*128));
 
 
 	/****** Content  ******************************/
