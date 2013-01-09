@@ -35,6 +35,85 @@ var init = function() {
 	};
 
 
+	/******************** title ********************/
+
+	function titleSetControls() {
+		//  Controls
+		titleSetControls = Function("");  //insures only runs once.
+		$(document).bind('keyup.a', menu_a_button);
+		$(document).bind('keyup.d', menu_d_button);
+		$(document).bind('keyup.left', menu_a_button);
+		$(document).bind('keyup.right', menu_d_button);
+		$(document).bind('keyup.return', menu_return_button);
+
+	 }; 
+		function menu_a_button() {
+			if (arrowPosition == 375 || arrowPosition == 475) {
+			helpText = "Press ENTER to select.";
+			arrowPosition -= 100;
+			}
+		 };
+
+	function menu_d_button() {
+			if (arrowPosition == 275 || arrowPosition == 375) {
+			helpText = "Press ENTER to select.";
+			arrowPosition += 100;
+			}    
+		 };
+	function menu_return_button() { 
+		if (arrowPosition == 275) {
+			$(document).unbind('keyup.a', menu_a_button);
+			$(document).unbind('keyup.d', menu_d_button);
+			$(document).unbind('keyup.left', menu_a_button);
+			$(document).unbind('keyup.right', menu_d_button);
+			$(document).unbind('keyup.return', menu_return_button);
+			gameMode = 1;
+		}
+		else if (arrowPosition == 375) {
+			helpText = "Not Implemented Yet.";
+		}
+		else if (arrowPosition == 475) {
+			helpText = "Not Implemented Yet.. either.";
+		}
+	};
+	/******************** GAME ********************/
+
+	function gameSetControls() {
+		//  Controls
+		gameSetControls = Function("");  //insures only runs once.
+		$(document).bind('keydown.w', game_w_button);
+		$(document).bind('keydown.s', game_s_button);
+		$(document).bind('keydown.a', game_a_button);
+		$(document).bind('keydown.d', game_d_button);
+		$(document).bind('keydown.up', game_w_button);
+		$(document).bind('keydown.down', game_s_button);
+		$(document).bind('keydown.left', game_a_button);
+		$(document).bind('keydown.right', game_d_button);
+		$(document).bind('keyup.return', game_return_button);
+	 };
+	function game_w_button() {
+		console.log("w");
+		console.log(player.isOnTile);
+		player.isOnTile - 1;
+		screen.loadTiles()
+	};
+	function game_a_button() {
+		console.log("a");
+	 	player.isOnTile - 1;
+		screen.loadTiles()
+	};
+	function game_s_button() {
+		console.log("s");
+		player.isOnTile + 128;
+		screen.loadTiles()
+	};
+	function game_d_button() {
+		console.log("d");
+	player.isOnTile + 1;
+		screen.loadTiles()
+	};
+	function game_return_button() {};
+
 
 
 	/****** Images  ******************************/
@@ -100,7 +179,6 @@ var init = function() {
 		map.data = [];
 		document.body.style.cursor = "progress";
 		loadingText = "Loading Map Data";
-		myDate = new Date();
 
 		for (var c = 0; c < (map.height*map.width); c += 1) {
 			var data = new Tile(tiles, c * map.tileSize);
@@ -115,7 +193,6 @@ var init = function() {
     	else if(a.x == b.x && a.y == b.y) { return 0; }
   	 });
 
-		console.log((new Date() - myDate));
 		screen.center = map.data[player.isOnTile];
 		loadingText = "Map Data Finished.";
 		document.body.style.cursor = "default";
@@ -133,17 +210,24 @@ var init = function() {
 		player.isOnTile = 0;
 		player.set = false;
 		player.spawn = function() {
+
 			player.set = true;
 			loadingText = "Creating Random Spawn Location...";
 			randomTile = 60 + ~~( Math.random() * (map.height * map.width) / 2);// first get a random number within the map
+
 			player.x = map.data[randomTile].x;								 									// use the random number as the id of a tile
-				if (player.x <= 11 || player.x >= 117 ) {player.spawn(); return;}	// check to make sure player.x won't go below 0
+				if (player.x <= 12 || player.x >= 117 ) {player.spawn(); return;}	// check to make sure player.x won't go below 0
+
 			player.y = map.data[randomTile].y;
-				if (player.y <= 8 || player.y >= 120 ) {player.spawn(); return;}
+				if (player.y <= 9 || player.y >= 120 ) {player.spawn(); return;}
+
 			player.isOnTile = map.data[randomTile].id;								 // each tile is an object with an x and a y, assign those.
-			//console.log( "Player will spawn at the tile at " + (player.x) + ", " + (player.y) + ". Player starts on tile: " + player.isOnTile);
-			//console.log("Player starts on tile: " + player.isOnTile);
 			loadingText	= "Player spawn set.";
+		};
+		player.draw = function() {
+
+			ctx.drawImage(hero_img, player.x, player.y);
+
 		};
 
 	var screen = new Object();
@@ -154,15 +238,14 @@ var init = function() {
 		The x to the left is now one less than the current position, the x to the right is one more
 		the y above is +128 the current array position, the y under is -128
 
-
 		************************/
 
 		screen.center =  0;
 		screen.selectAll = [];
-		console.log("screen.selectAll.length: "+screen.selectAll.length);   //logic test
-		screen.loadTiles = function(margin) {
+		screen.loadTiles = function() {
+
 			//function for grabbing the screen
-			// the argument margin expands the area. 
+			// the argument margin expands the area. Only needs to be called on X or y position update.
 			console.log("Player on tile: " + player.isOnTile + " which converts to " + map.data[player.isOnTile].x +", "+map.data[player.isOnTile].y);
 			console.log("The lowest possible at spawn being: " + (map.data[player.isOnTile].x - 10) + ", " + (map.data[(player.isOnTile)].x +10) + ", " + (map.data[player.isOnTile].y - 7) + ", " +( map.data[player.isOnTile].y + 7) + ". ");
 			var topLeftCorner =  map.data[ player.isOnTile - 10 - (128 * 7 ) ];
@@ -182,11 +265,12 @@ var init = function() {
 
 			}
 			loadingText = "     Done.";
-		console.log("screen.selectAll.length: "+screen.selectAll.length);  //logic test
-		//if (screen.selectAll.length === 0) screen.loadTiles(0);
 		};
+
 		screen.move = function() {
-			ctx.translate((screen.selectAll[0].x)*-50, (screen.selectAll[0].y)*-50);
+			ctx.translate((screen.selectAll[0].x)*-50, (screen.selectAll[0].y)*-50);	//moves the screen to match the player position.
+				player.x = screen.selectAll[~~(screen.selectAll.length/2)].x*50;
+				player.y =  screen.selectAll[~~(screen.selectAll.length/2)].y*50;
 		};
 		screen.drawTiles = function() {
 			for (var i = 0; i < screen.selectAll.length; i+=1)
@@ -197,10 +281,11 @@ var init = function() {
 				if (screen.selectAll[i].image ===1) ctx.drawImage(grass2, screen.selectAll[i].x*50, screen.selectAll[i].y*50);
 				else if (screen.selectAll[i].image ===2) ctx.drawImage(grass3, screen.selectAll[i].x*50, screen.selectAll[i].y*50);
 				else if (screen.selectAll[i].image ===3) ctx.drawImage(grass2, screen.selectAll[i].x*50, screen.selectAll[i].y*50);
-				else if (screen.selectAll[i].image ===4) ctx.drawImage(grass1, screen.selectAll[i].x*50, screen.selectAll[i].y*50);
-				else  ctx.drawImage(grass2, screen.selectAll[i].x*50, screen.selectAll[i].y*50);
+				else if (screen.selectAll[i].image ===4) ctx.drawImage(grass2, screen.selectAll[i].x*50, screen.selectAll[i].y*50);
+				else  ctx.drawImage(grass3, screen.selectAll[i].x*50, screen.selectAll[i].y*50);
 				//ctx.drawImage(grass1, i, i);
 			}
+
 		};
 
 
@@ -244,9 +329,8 @@ var init = function() {
 		  helpText = "Press ENTER to select.",
 		  flicker = 0;
 	function titleScreen() {
-
-		//This is the title, in which people will choose from seperate options.
 		titleSetControls();
+
 		//rendered screen
 
 		ctx.fillStyle = bgColor;
@@ -257,8 +341,8 @@ var init = function() {
 		ctx.drawImage(title_logo1, 320, 180);
 
 		flicker += 1;
-		if (flicker % 15 == 0) {
-			ctx.fillStyle = bgColor;
+		if (flicker % 80 == 0) {
+			ctx.fillStyle = "#ccf";
 			flicker=0;
 		}
 		else { ctx.fillStyle = lightText; }
@@ -274,46 +358,6 @@ var init = function() {
 
 	}; // end of titleScreen
 
-	function menu_a_button() {
-		if (arrowPosition == 375 || arrowPosition == 475) {
-			helpText = "Press ENTER to select.";
-			arrowPosition -= 100;
-		}
-	};
-
-	function menu_d_button() {
-		if (arrowPosition == 275 || arrowPosition == 375) {
-			helpText = "Press ENTER to select.";
-			arrowPosition += 100;
-		}    
-	};
-	function menu_return_button() { 
-		if (arrowPosition == 275) {
-			$(document).unbind('keyup.a', menu_a_button);
-			$(document).unbind('keyup.d', menu_d_button);
-			$(document).unbind('keyup.left', menu_a_button);
-			$(document).unbind('keyup.right', menu_d_button);
-			$(document).unbind('keyup.return', menu_return_button);
-			gameMode = 1;
-		}
-		else if (arrowPosition == 375) {
-			helpText = "Not Implemented Yet.";
-		}
-		else if (arrowPosition == 475) {
-			helpText = "Not Implemented Yet.. either.";
-		}
-	};
-
-	function titleSetControls() {
-		//  Controls
-		titleSetControls = Function("");  //insures only runs once.
-		$(document).bind('keyup.a', menu_a_button);
-		$(document).bind('keyup.d', menu_d_button);
-		$(document).bind('keyup.left', menu_a_button);
-		$(document).bind('keyup.right', menu_d_button);
-		$(document).bind('keyup.return', menu_return_button);
-
-	}; //end of titleSetControls
 
 
 
@@ -350,13 +394,18 @@ var init = function() {
 	}; //end of loadGame
 
 	function game() {
+		gameSetControls();
 		ctx.fillStyle = bgColor;
 		ctx.fillRect(0,0, canvas.width, canvas.height);
 		ctx.font = "normal 14px PressStart2P";
 		ctx.fillStyle = lightText;
 		ctx.drawImage(title_logo1, 320, 180);
-		screen.drawTiles();
-		screen.move();
+		screen.drawTiles();														//	draw background
+		player.draw();																// draw player's character
+		//ctx.drawImage(hero_img, 9, 9);
+		//ctx.drawImage(hero_img, map.data[player.isOnTile].x, map.data[player.isOnTile].y);
+		screen.move();																//	Adjust screen to player position
+
 
 	};
 
