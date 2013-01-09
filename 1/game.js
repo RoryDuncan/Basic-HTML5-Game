@@ -94,24 +94,24 @@ var init = function() {
 	function game_w_button() {
 		console.log("w");
 		console.log(player.isOnTile);
-		player.isOnTile -= 1;
-		screen.loadTiles()
+		player.isOnTile -= 128;
+		game();
 	};
 	function game_a_button() {
 		console.log("a");
 	 	player.isOnTile -= 1;
-		screen.loadTiles()
+		game();
 	};
 	function game_s_button() {
 		console.log("s");
 		player.isOnTile += 128;
-		screen.loadTiles()
+		game();
 	};
 	function game_d_button() {
 		console.log("d");
-	player.isOnTile += 1;
-		screen.loadTiles()
-	};
+		player.isOnTile += 1;
+		game();
+		};
 	function game_return_button() {};
 
 
@@ -225,7 +225,8 @@ var init = function() {
 			loadingText	= "Player spawn set.";
 		};
 		player.draw = function() {
-
+			player.x = screen.selectAll[~~(screen.selectAll.length/2)].x*50;
+			player.y =  screen.selectAll[~~(screen.selectAll.length/2)].y*50;
 			ctx.drawImage(hero_img, player.x, player.y);
 
 		};
@@ -251,7 +252,7 @@ var init = function() {
 			var topLeftCorner =  map.data[ player.isOnTile - 10 - (128 * 7 ) ];
 			var botLeftCorner =  map.data[ player.isOnTile - 10 + (128 * 7 ) ];
 			var topRightCorner =  map.data[ player.isOnTile + 10 - (128 * 7 ) ];
-			//var botRightCorner =  map.data[ Math.abs(player.isOnTile + 10 + ( 128 * 7 )) ];
+			var botRightCorner =  map.data[ player.isOnTile + 10 + ( 128 * 7 ) ];
 			//console.log(map.data[check-5], map.data[check-1], map.data[check], map.data[check+1], map.data[check+5]);
 			screen.selectAll = [];  // clears array
 			//console.log(topLeftCorner, map.data[topLeftCorner.id+1]);
@@ -269,8 +270,6 @@ var init = function() {
 
 		screen.move = function() {
 			ctx.translate((screen.selectAll[0].x)*-50, (screen.selectAll[0].y)*-50);	//moves the screen to match the player position.
-				player.x = screen.selectAll[~~(screen.selectAll.length/2)].x*50;
-				player.y =  screen.selectAll[~~(screen.selectAll.length/2)].y*50;
 		};
 		screen.drawTiles = function() {
 			for (var i = 0; i < screen.selectAll.length; i+=1)
