@@ -32,7 +32,9 @@ var init = function() {
 			x: event.pageX - this.offsetLeft,
 			y: event.pageY - this.offsetTop
 		}
+		
 	};
+
 
 
 	/******************** title ********************/
@@ -40,11 +42,18 @@ var init = function() {
 	function titleSetControls() {
 		//  Controls
 		titleSetControls = Function("");  //insures only runs once.
+
+
 		$(document).bind('keyup.a', menu_a_button);
 		$(document).bind('keyup.d', menu_d_button);
 		$(document).bind('keyup.left', menu_a_button);
 		$(document).bind('keyup.right', menu_d_button);
 		$(document).bind('keyup.return', menu_return_button);
+
+		$(document).bind('keyup.u', pan_up);
+		$(document).bind('keyup.h', pan_left);
+		$(document).bind('keyup.j', pan_down);
+		$(document).bind('keyup.k', pan_right);
 
 	 }; 
 		function menu_a_button() {
@@ -91,29 +100,48 @@ var init = function() {
 		$(document).bind('keydown.right', game_d_button);
 		$(document).bind('keyup.return', game_return_button);
 	 };
-	function game_w_button() {
-		console.log("w");
-		console.log(player.isOnTile);
-		player.isOnTile -= 128;
-		game();
-	};
-	function game_a_button() {
-		console.log("a");
-	 	player.isOnTile -= 1;
-		game();
-	};
-	function game_s_button() {
-		console.log("s");
-		player.isOnTile += 128;
-		game();
-	};
-	function game_d_button() {
-		console.log("d");
-		player.isOnTile += 1;
-		game();
-		};
+	function game_w_button() {};
+	function game_a_button() {};
+	function game_s_button() {};
+	function game_d_button() {};
 	function game_return_button() {};
 
+	function pan_up() {
+		//screen.moveToY-=50;
+		pan( 0, -50);
+	};
+	function pan_left() {
+		//screen.moveToX-=50;
+		pan(-50, 0);
+	};
+	function pan_down() {
+		//screen.moveToY+=50;
+		pan(0, 50);
+	};
+	function pan_right() {
+		//screen.moveToX+=50;
+		pan(50, 0);
+	};
+
+	function pan(newX, newY) {
+
+		if ( newY !== undefined ) {
+			console.log("bam!");
+			screen.moveToX = newX;
+			screen.moveToY = newY;
+			screen.x += screen.moveToX;
+			screen.y += screen.moveToY;
+			ctx.translate(screen.moveToX, screen.moveToY);
+		}
+		else {
+			console.log("bing!");
+			screen.x += screen.moveToX;
+			screen.y += screen.moveToY;
+			ctx.translate(screen.moveToX, screen.moveToY);
+		}
+			screen.moveToX = 0;
+			screen.moveToY = 0;
+	};
 
 
 	/****** Images  ******************************/
@@ -160,31 +188,40 @@ var init = function() {
 	var map = new Object();
 	map.height = 128;
 	map.width = 128;
-	var tiles = 0, //the area of the map.
-	Tile = function(number, xpos, indx) { //constructor
+	map.tiles = 0, //the area of the map.
+	Tile = function(number, xpos, ypos, indx) { //constructor
 		this.id = number;
-		this.x = ~~(tiles%map.width); // Every 128 tiles, the x is incremented
-		this.y = ~~(number/128);		 // Divided by 128 to exhume the Y from the area, 
-		if (indx === 0 || indx === 1 || indx === 2 || indx === 3 || indx === 4 ) {
+		//this.x = ~~(tiles%map.width); // Every 128 tiles, the x is incremented
+		//this.y = ~~(number/128);		 // Divided by 128 to exhume the Y from the area, 
+		this.x = xpos;
+		this.y = ypos;
+		if (indx) {
 			this.image = indx;
 		}
 		else { this.image = ~~(Math.random() * 4); }
-		tiles += 1;
+		map.tiles += 1;
 	 };
 	map.data = new Array();
 	map.tileSize = 50;
 	map.made = false;
 	map.makeMap = function() {
-		map.made = true;
-		map.data = [];
-		document.body.style.cursor = "progress";
-		loadingText = "Loading Map Data";
 
-		for (var c = 0; c < (map.height*map.width); c += 1) {
-			var data = new Tile(tiles, c * map.tileSize);
+		map.data = [];
+		loadingText = "Loading Map Data";
+		var myDate = new Date();
+		for (var i=0, x = 0, y = 0; i < (map.height*map.width); i += 1, x+=1) {
+			if (x === map.width) {
+				x = 0;
+				y+=1;
+			}
+			var data = new Tile(map.tiles, x, y);
 			map.data.push(data);
 		}
-
+		var result = (new Date() - myDate);
+		loadingText = (map.tiles + " tiles loaded in " + result + " milliseconds.");
+		console.log(map.data);
+		map.made = true;
+		/*
 		map.data.sort(function(a, b) {//Sorting of the array containing the map tiles. Sorts y, then x
     	if(a.y < b.y) { return -1; }
     	else if(a.y > b.y) { return 1; }
@@ -192,10 +229,8 @@ var init = function() {
     	else if(a.x > b.x) { return 1; }
     	else if(a.x == b.x && a.y == b.y) { return 0; }
   	 });
-
-		screen.center = map.data[player.isOnTile];
-		loadingText = "Map Data Finished.";
-		document.body.style.cursor = "default";
+		*/
+		
 	};
 	map.draw = function() {
 		loadingText = "Drawing Map..";
@@ -208,26 +243,16 @@ var init = function() {
 		player.x = 0;
 		player.y = 0;
 		player.isOnTile = 0;
+		player.spawnTile = 0;
 		player.set = false;
+
 		player.spawn = function() {
-
-			player.set = true;
-			loadingText = "Creating Random Spawn Location...";
-			randomTile = 60 + ~~( Math.random() * (map.height * map.width) / 2);// first get a random number within the map
-
-			player.x = map.data[randomTile].x;								 									// use the random number as the id of a tile
-				if (player.x <= 12 || player.x >= 117 ) {player.spawn(); return;}	// check to make sure player.x won't go below 0
-
-			player.y = map.data[randomTile].y;
-				if (player.y <= 9 || player.y >= 120 ) {player.spawn(); return;}
-
-			player.isOnTile = map.data[randomTile].id;								 // each tile is an object with an x and a y, assign those.
-			loadingText	= "Player spawn set.";
+			/*			Needs rewriting	*/
 		};
+
 		player.draw = function() {
-			player.x = screen.selectAll[~~(screen.selectAll.length/2)].x*50;
-			player.y =  screen.selectAll[~~(screen.selectAll.length/2)].y*50;
-			ctx.drawImage(hero_img, player.x, player.y);
+			//ctx.drawImage(hero_img, map.data[player.isOnTile].x*50, map.data[player.isOnTile].y*50);
+			//screen.move();
 
 		};
 
@@ -241,51 +266,63 @@ var init = function() {
 
 		************************/
 
-		screen.center =  0;
-		screen.selectAll = [];
-		screen.loadTiles = function() {
+		screen.center = 1200;
+		screen.moveToX = 0;
+		screen.moveToY = 0;
+		screen.x = 0;			//keeps track of the screen position
+		screen.y = 0;
+		screen.selected = [];
+		screen.select = function() {
 
-			//function for grabbing the screen
-			// the argument margin expands the area. Only needs to be called on X or y position update.
-			console.log("Player on tile: " + player.isOnTile + " which converts to " + map.data[player.isOnTile].x +", "+map.data[player.isOnTile].y);
-			console.log("The lowest possible at spawn being: " + (map.data[player.isOnTile].x - 10) + ", " + (map.data[(player.isOnTile)].x +10) + ", " + (map.data[player.isOnTile].y - 7) + ", " +( map.data[player.isOnTile].y + 7) + ". ");
-			var topLeftCorner =  map.data[ player.isOnTile - 10 - (128 * 7 ) ];
-			var botLeftCorner =  map.data[ player.isOnTile - 10 + (128 * 7 ) ];
-			var topRightCorner =  map.data[ player.isOnTile + 10 - (128 * 7 ) ];
-			var botRightCorner =  map.data[ player.isOnTile + 10 + ( 128 * 7 ) ];
-			//console.log(map.data[check-5], map.data[check-1], map.data[check], map.data[check+1], map.data[check+5]);
-			screen.selectAll = [];  // clears array
-			//console.log(topLeftCorner, map.data[topLeftCorner.id+1]);
+			var center = screen.center;
 
-			for (col = topLeftCorner.y; col <= botLeftCorner.y; col+=1) {
+			/*debug*/	//console.log("Center: "+center);
 
-				for (row=topLeftCorner.x; row <= topRightCorner.x; row +=1) {
-					var currentTile = map.data[row + (col * 128)];
-					screen.selectAll.push(currentTile);
+			var bottomRightCorner = (center+10)+(map.width*7);
+			if ( bottomRightCorner < 0 ) { return console.log("Need to generate more tiles."); }
+
+			///*debug*/	console.log("Bottom Right: "+bottomRightCorner);
+			///*debug*/	console.log("Bottom Right X: "+map.data[bottomRightCorner].x);
+			///*debug*/	console.log("Bottom Right Y: "+map.data[bottomRightCorner].y);
+			var topLeftCorner = (center-10)-(map.width*7);
+
+			if ( topLeftCorner < 0 ) { return console.log("Need to generate more tiles."); }
+			///*debug*/console.log("Top Left: "+topLeftCorner);
+			///*debug*/console.log("Top Left X: "+map.data[topLeftCorner].x);
+
+			for (var i = topLeftCorner, xx = (map.data[bottomRightCorner].x - map.data[topLeftCorner].x)+1, counter = 0;  /*i < bottomRightCorner*/ counter < 315; i++, counter++) {
+					if ( counter % (xx) === 0  && counter != 0) {
+						//console.log("From " + i + " to " + (i+ ( 128 - xx ) ) );
+						i+=(128 - (xx));
+					 }
+					var data = map.data[i];
+					screen.selected.push(data);
+					if (i >= (bottomRightCorner)) break;
+
 				}
-
-			}
-			loadingText = "     Done.";
+			screen.tilesLoaded = true;
+			console.log(screen.selected);	
 		};
-
-		screen.move = function() {
-			ctx.translate((screen.selectAll[0].x)*-50, (screen.selectAll[0].y)*-50);	//moves the screen to match the player position.
-		};
+		screen.tilesLoaded = false;
+		screen.loadTiles = function() { };
+		screen.move = function() { };
 		screen.drawTiles = function() {
-			for (var i = 0; i < screen.selectAll.length; i+=1)
-			{
-				ctx.fillStyle=bgColor;
-				ctx.fillRect(screen.selectAll[0].x, screen.selectAll[0].y, screen.selectAll[0].x+1050, screen.selectAll[0].y+750);
-				//grass_tile = grass + screen.selectAll[i].image;
-				if (screen.selectAll[i].image ===1) ctx.drawImage(grass2, screen.selectAll[i].x*50, screen.selectAll[i].y*50);
-				else if (screen.selectAll[i].image ===2) ctx.drawImage(grass3, screen.selectAll[i].x*50, screen.selectAll[i].y*50);
-				else if (screen.selectAll[i].image ===3) ctx.drawImage(grass2, screen.selectAll[i].x*50, screen.selectAll[i].y*50);
-				else if (screen.selectAll[i].image ===4) ctx.drawImage(grass2, screen.selectAll[i].x*50, screen.selectAll[i].y*50);
-				else  ctx.drawImage(grass3, screen.selectAll[i].x*50, screen.selectAll[i].y*50);
-				//ctx.drawImage(grass1, i, i);
+			SetScreenInitially();
+			//console.log("Drawing Tiles");
+
+			for (var i = 0, ii = screen.selected.length; i < ii; i++) {
+
+				ctx.drawImage(grass3, screen.selected[i].x*map.tileSize, screen.selected[i].y*map.tileSize);
 			}
 
 		};
+		var SetScreenInitially = function() {
+
+				SetScreenInitially = Function("");	//	rewrite the function
+				console.log("Set to " + screen.selected[0].x*-50 + ", " + screen.selected[0].y*-50);
+				pan(screen.selected[0].x*-50, screen.selected[0].y*-50);
+
+			};
 
 
 	/****** Content  ******************************/
@@ -317,6 +354,7 @@ var init = function() {
 
 
 	function drawScreen() {
+		console.log("drawn");
 		if (gameMode === 0) titleScreen();
 		if (gameMode === 1) loadGame();
 		if (gameMode === 2) game();
@@ -327,9 +365,11 @@ var init = function() {
 	var arrowPosition = 275,
 		  helpText = "Press ENTER to select.",
 		  flicker = 0;
-	function titleScreen() {
-		titleSetControls();
 
+
+	function titleScreen() {
+
+		titleSetControls();
 		//rendered screen
 
 		ctx.fillStyle = bgColor;
@@ -364,7 +404,7 @@ var init = function() {
 	loadingColor = 0; //counter for loading screen effect
 
 	function loadGame() {
-		//loadGame = Function("");
+
 		ctx.fillStyle = bgColor;
 		ctx.fillRect(0,0, canvas.width, canvas.height);
 		ctx.font = "normal 14px PressStart2P";
@@ -381,31 +421,27 @@ var init = function() {
 			ctx.fillStyle = "#ccc";
 		}
 
-		ctx.fillText(loadingText, 350, 400);
-
+		ctx.fillText(loadingText, (350 - loadingText.length*3), 400);
 		if (map.made === false) {
 			map.makeMap();
-			player.spawn();
-			screen.loadTiles(0);
+			screen.select();
+			//player.spawn();
+
 		}
-		else gameMode = 2;
+
+		if (screen.tilesLoaded === true) { gameMode = 2; }
+
 
 	}; //end of loadGame
 
 	function game() {
-		gameSetControls();
 		ctx.fillStyle = bgColor;
-		ctx.fillRect(0,0, canvas.width, canvas.height);
-		ctx.font = "normal 14px PressStart2P";
+		ctx.fillRect(screen.selected.length*(-50), screen.selected.length*(-50), (screen.selected.length*50)*2+100, (screen.selected.length*50)*2+100);
 		ctx.fillStyle = lightText;
-		ctx.drawImage(title_logo1, 320, 180);
-		screen.drawTiles();														//	draw background
-		player.draw();																// draw player's character
-		//ctx.drawImage(hero_img, 9, 9);
-		//ctx.drawImage(hero_img, map.data[player.isOnTile].x, map.data[player.isOnTile].y);
-		screen.move();																//	Adjust screen to player position
+		ctx.fillText("Drawing...", 20, 20);
 
-
+		//pan();
+		screen.drawTiles();
 	};
 
 	drawScreen();
