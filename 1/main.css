@@ -12,13 +12,16 @@ body {
 	font-family: "Segoe UI", Sans-serif;
 	font-weight:lighter;
 	font-size:.8em;
-	background-color:#131313;
+	background-color:#181818;
 }
 
 #output {
-	margin: 0 auto;
+	margin: 10px auto;
 	display:block;
 	background-color:#000;
+	border: 1px solid #161616;
+	border-radius: 10px;
+	moz-border-radius: 10px;
 }
 
 p, h4 {

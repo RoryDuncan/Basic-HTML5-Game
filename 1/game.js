@@ -9,11 +9,10 @@ var init = function() {
 
 	var canvas = document.getElementById("output"),
 			ctx = canvas.getContext("2d"),
- 			W = window.screen.availWidth,
-			H = window.screen.availHeight;
+ 			W = window.screenavailWidth,
+			H = window.screenavailHeight;
 	canvas.height = 750;
 	canvas.width = 1050;
-	var gameMode = 0; //game modes: 0=title, 1 = loading, 2 = gameplay, 3 = game menu 
 	console.log("Initialized.");
 
 
@@ -57,32 +56,32 @@ var init = function() {
 
 	 }; 
 		function menu_a_button() {
-			if (arrowPosition == 375 || arrowPosition == 475) {
-			helpText = "Press ENTER to select.";
-			arrowPosition -= 100;
+			if (Game.arrow == 375 || Game.arrow == 475) {
+			Game.helpText = "Press ENTER to select.";
+			Game.arrow -= 100;
 			}
 		 };
 
 	function menu_d_button() {
-			if (arrowPosition == 275 || arrowPosition == 375) {
-			helpText = "Press ENTER to select.";
-			arrowPosition += 100;
+			if (Game.arrow == 275 || Game.arrow == 375) {
+			Game.helpText = "Press ENTER to select.";
+			Game.arrow += 100;
 			}    
 		 };
 	function menu_return_button() { 
-		if (arrowPosition == 275) {
+		if (Game.arrow == 275) {
 			$(document).unbind('keyup.a', menu_a_button);
 			$(document).unbind('keyup.d', menu_d_button);
 			$(document).unbind('keyup.left', menu_a_button);
 			$(document).unbind('keyup.right', menu_d_button);
 			$(document).unbind('keyup.return', menu_return_button);
-			gameMode = 1;
+			Game.mode = 1;
 		}
-		else if (arrowPosition == 375) {
-			helpText = "Not Implemented Yet.";
+		else if (Game.arrow == 375) {
+			Game.helpText = "Not Implemented Yet.";
 		}
-		else if (arrowPosition == 475) {
-			helpText = "Not Implemented Yet.. either.";
+		else if (Game.arrow == 475) {
+			Game.helpText = "Not Implemented Yet.. either.";
 		}
 	};
 	/******************** GAME ********************/
@@ -107,40 +106,61 @@ var init = function() {
 	function game_return_button() {};
 
 	function pan_up() {
-		//screen.moveToY-=50;
+
 		pan( 0, -50);
 	};
 	function pan_left() {
-		//screen.moveToX-=50;
+		
 		pan(-50, 0);
 	};
 	function pan_down() {
-		//screen.moveToY+=50;
+		
 		pan(0, 50);
 	};
 	function pan_right() {
-		//screen.moveToX+=50;
+		
 		pan(50, 0);
 	};
-
 	function pan(newX, newY) {
 
-		if ( newY !== undefined ) {
+		if ( typeof newY !== "undefined") {
 			console.log("bam!");
-			screen.moveToX = newX;
-			screen.moveToY = newY;
-			screen.x += screen.moveToX;
-			screen.y += screen.moveToY;
-			ctx.translate(screen.moveToX, screen.moveToY);
+			Screen.moveToX = newX;
+			Screen.moveToY = newY;
+			Screen.x += Screen.moveToX;
+			Screen.y += Screen.moveToY;
+			
+			var a = 0;
+			var move = function() {
+
+				if ( a < 50 ) {
+					a += 1;
+					ctx.translate(Screen.moveToX/50, Screen.moveToY/50);
+				}
+				else if (a === 50) {
+					window.clearInterval(panInterval);
+					a = 0;
+					Screen.moveToX = 0;
+					Screen.moveToY = 0;
+				}
+			}
+			var panInterval = window.setInterval(move, 1000/60);
+				
+			
 		}
 		else {
-			console.log("bing!");
-			screen.x += screen.moveToX;
-			screen.y += screen.moveToY;
-			ctx.translate(screen.moveToX, screen.moveToY);
+
+			/* manually setting Screen.moveToX/moveToY then calling pan(); will instantly move the Screen. */
+			console.log("bing!");		
+			Screen.x += Screen.moveToX;
+			Screen.y += Screen.moveToY;
+
+			ctx.translate(Screen.moveToX, Screen.moveToY);
+			Screen.moveToX = 0;
+			Screen.moveToY = 0;
 		}
-			screen.moveToX = 0;
-			screen.moveToY = 0;
+
+
 	};
 
 
@@ -174,166 +194,290 @@ var init = function() {
 
 
 
-	/****** Colors  ******************************/
-
-	var bgColor = "#181818",
-		lightText = "#8f8f8f",
-		menuText = "#377778";
 
 
 
 
-	/****** Objects  ******************************/
+/****** Objects  
+	█████        ████                        █  
+	█           █        █            █                    █
+	█           █        █████                    █
+	█            █       █          ██       █       █
+	█████       ██████      ████        ██
+******************************/
 
-	var map = new Object();
-	map.height = 128;
-	map.width = 128;
-	map.tiles = 0, //the area of the map.
+/**/var Color = {};
+	 	Color.background = "#181818",
+		Color.infotext = "#8f8f8f",
+		Color.menuText = "#377778";
+
+
+
+/**/var Map = {};
+	Map.height = 128;
+	Map.width = 128;
+	Map.tiles = 0, //the area of the Map.
 	Tile = function(number, xpos, ypos, indx) { //constructor
-		this.id = number;
-		//this.x = ~~(tiles%map.width); // Every 128 tiles, the x is incremented
-		//this.y = ~~(number/128);		 // Divided by 128 to exhume the Y from the area, 
+		this.id = number; 
 		this.x = xpos;
 		this.y = ypos;
 		if (indx) {
 			this.image = indx;
 		}
 		else { this.image = ~~(Math.random() * 4); }
-		map.tiles += 1;
+		Map.tiles += 1;
 	 };
-	map.data = new Array();
-	map.tileSize = 50;
-	map.made = false;
-	map.makeMap = function() {
+	Map.data = new Array();
+	Map.tileSize = 50;
+	Map.made = false;
+	Map.makeMap = function() {
 
-		map.data = [];
-		loadingText = "Loading Map Data";
+		Map.data = [];
+		Game.loadingText = "Loading Map Data";
 		var myDate = new Date();
-		for (var i=0, x = 0, y = 0; i < (map.height*map.width); i += 1, x+=1) {
-			if (x === map.width) {
+		for (var i=0, x = 0, y = 0; i < (Map.height*Map.width); i += 1, x+=1) {
+			if (x === Map.width) {
 				x = 0;
 				y+=1;
 			}
-			var data = new Tile(map.tiles, x, y);
-			map.data.push(data);
+			var data = new Tile(Map.tiles, x, y);
+			Map.data.push(data);
 		}
 		var result = (new Date() - myDate);
-		loadingText = (map.tiles + " tiles loaded in " + result + " milliseconds.");
-		console.log(map.data);
-		map.made = true;
-		/*
-		map.data.sort(function(a, b) {//Sorting of the array containing the map tiles. Sorts y, then x
-    	if(a.y < b.y) { return -1; }
-    	else if(a.y > b.y) { return 1; }
-    	else if(a.x < b.x) { return -1; }
-    	else if(a.x > b.x) { return 1; }
-    	else if(a.x == b.x && a.y == b.y) { return 0; }
-  	 });
-		*/
+		Game.loadingText = (Map.tiles + " tiles loaded in " + result + " milliseconds.");
+		console.log(Map.data);
+		Map.made = true;
 		
 	};
-	map.draw = function() {
-		loadingText = "Drawing Map..";
-		
+	Map.draw = function() {
+		Game.loadingText = "Drawing Map..";
 	};
 
 
 
-	var player = new Object();
-		player.x = 0;
-		player.y = 0;
-		player.isOnTile = 0;
-		player.spawnTile = 0;
-		player.set = false;
+/**/var Screen = {};
 
-		player.spawn = function() {
-			/*			Needs rewriting	*/
-		};
+		Screen.center = 1200;
+		Screen.moveToX = 0;
+		Screen.moveToY = 0;
+		Screen.x = 0;			//keeps track of the Screen position
+		Screen.y = 0;
+		Screen.selected = [];
+		Screen.select = function() {
 
-		player.draw = function() {
-			//ctx.drawImage(hero_img, map.data[player.isOnTile].x*50, map.data[player.isOnTile].y*50);
-			//screen.move();
-
-		};
-
-	var screen = new Object();
-
-		/****** NOTES **********
-		the screen is 1050 wide, 750 high. the 50 is added to make a center tile possible
-		
-		The x to the left is now one less than the current position, the x to the right is one more
-		the y above is +128 the current array position, the y under is -128
-
-		************************/
-
-		screen.center = 1200;
-		screen.moveToX = 0;
-		screen.moveToY = 0;
-		screen.x = 0;			//keeps track of the screen position
-		screen.y = 0;
-		screen.selected = [];
-		screen.select = function() {
-
-			var center = screen.center;
+			var center = Screen.center;
 
 			/*debug*/	//console.log("Center: "+center);
 
-			var bottomRightCorner = (center+10)+(map.width*7);
+			var bottomRightCorner = (center+11)+(Map.width*8);
 			if ( bottomRightCorner < 0 ) { return console.log("Need to generate more tiles."); }
 
 			///*debug*/	console.log("Bottom Right: "+bottomRightCorner);
-			///*debug*/	console.log("Bottom Right X: "+map.data[bottomRightCorner].x);
-			///*debug*/	console.log("Bottom Right Y: "+map.data[bottomRightCorner].y);
-			var topLeftCorner = (center-10)-(map.width*7);
+			///*debug*/	console.log("Bottom Right X: "+Map.data[bottomRightCorner].x);
+			///*debug*/	console.log("Bottom Right Y: "+Map.data[bottomRightCorner].y);
+			var topLeftCorner = (center-11)-(Map.width*8);
 
 			if ( topLeftCorner < 0 ) { return console.log("Need to generate more tiles."); }
 			///*debug*/console.log("Top Left: "+topLeftCorner);
-			///*debug*/console.log("Top Left X: "+map.data[topLeftCorner].x);
+			///*debug*/console.log("Top Left X: "+Map.data[topLeftCorner].x);
 
-			for (var i = topLeftCorner, xx = (map.data[bottomRightCorner].x - map.data[topLeftCorner].x)+1, counter = 0;  /*i < bottomRightCorner*/ counter < 315; i++, counter++) {
+			for (var i = topLeftCorner, xx = (Map.data[bottomRightCorner].x - Map.data[topLeftCorner].x)+1, counter = 0;  /*i < bottomRightCorner*/ counter < 391; i++, counter++) {
 					if ( counter % (xx) === 0  && counter != 0) {
 						//console.log("From " + i + " to " + (i+ ( 128 - xx ) ) );
 						i+=(128 - (xx));
 					 }
-					var data = map.data[i];
-					screen.selected.push(data);
+					var data = Map.data[i];
+					Screen.selected.push(data);
 					if (i >= (bottomRightCorner)) break;
 
 				}
-			screen.tilesLoaded = true;
-			console.log(screen.selected);	
+			Screen.tilesLoaded = true;
+			console.log(Screen.selected);	
 		};
-		screen.tilesLoaded = false;
-		screen.loadTiles = function() { };
-		screen.move = function() { };
-		screen.drawTiles = function() {
-			SetScreenInitially();
-			//console.log("Drawing Tiles");
+		Screen.tilesLoaded = false;
+		Screen.loadTiles = function() { };
+		Screen.move = function() { };
+		Screen.drawTiles = function() {
 
-			for (var i = 0, ii = screen.selected.length; i < ii; i++) {
+			Screen.SetScreenInitially();
 
-				ctx.drawImage(grass3, screen.selected[i].x*map.tileSize, screen.selected[i].y*map.tileSize);
+			for (var i = 0, ii = Screen.selected.length; i < ii; i++) {
+
+				var grassRoll = Math.random();
+				if (grassRoll > .35) ctx.drawImage(grass4, Screen.selected[i].x*Map.tileSize, Screen.selected[i].y*Map.tileSize);
+				//if (grassRoll < .65) ctx.drawImage(grass3, Screen.selected[i].x*Map.tileSize, Screen.selected[i].y*Map.tileSize);
+				else ctx.drawImage(grass4, Screen.selected[i].x*Map.tileSize, Screen.selected[i].y*Map.tileSize);
+				
 			}
 
 		};
-		var SetScreenInitially = function() {
+		Screen.SetScreenInitially = function() {
 
-				SetScreenInitially = Function("");	//	rewrite the function
-				console.log("Set to " + screen.selected[0].x*-50 + ", " + screen.selected[0].y*-50);
-				pan(screen.selected[0].x*-50, screen.selected[0].y*-50);
+				Screen.SetScreenInitially = Function("");	//	rewrite the function
+				//console.log("Set to " + Screen.selected[0].x*-50 + ", " + Screen.selected[0].y*-50);
+				Screen.moveToX = Screen.selected[24].x*-50;
+				Screen.moveToY =  Screen.selected[24].y*-50;
+				pan();
 
 			};
+/**/var Player = {};
+		Player.x = 0;
+		Player.y = 0;
+		Player.isOnTile = 0;
+		Player.spawnTile = 0;
+		Player.set = false;
+
+		Player.spawn = function() {
+			Player.SetScreenInitially = Function(""); //rewrite the function
+			Player.x = Map.data[Screen.center].x;
+			Player.y = Map.data[Screen.center].y;
+			Player.isOnTile = Screen.center;
+			Player.spawnTile = Screen.center;
+			console.log(" ");
+		};
+
+		Player.draw = function() {
+			ctx.drawImage(hero_img, Player.x*50, (Player.y*50)-10);
+
+		};
+
+
+
+/**/var Entity = {};
+		Entity.all = [];
+		Entity.add = function(entity) {
+			Entity.all.push(entity);
+		};
+
+
+
+	/**/function Timer() {
+		this.gameTime = 0;
+  		this.maxStep = 0.05;
+  		this.wallLastTimestamp = 0;
+	 }
+
+	/**/Timer.prototype.tick = function() {
+		var wallCurrent = Date.now();
+		var wallDelta = (wallCurrent - this.wallLastTimestamp) / 1000;
+		this.lastTimestamp = wallCurrent;
+
+		var gameDelta = Math.min(wallDelta, this.maxStep);
+		this.gameTime += gameDelta;
+		return gameDelta;
+	};
+
+
+/**/var Game = {};
+		Game.mode = 0;
+		Game.timer = new Timer();
+		Game.drawScreen = function() {	/*		DrawScreen			*/
+
+			//console.log("drawn");
+			Game.checkState();
+			if (Game.mode === 0) Game.titleScreen();
+			if (Game.mode === 1) Game.load();
+			if (Game.mode === 2) { Game.init();}
+		 };
+		Game.arrow = 275;
+		Game.helpText = "Press ENTER to select.";
+		Game.flicker = 0;
+		Game.titleScreen = function() {
+
+			titleSetControls();
+			//rendered Screen
+			ctx.fillStyle = Color.background;
+			ctx.fillRect(-5000,-5000, canvas.width+10000, canvas.height+10000);
+			ctx.font = "normal 14px PressStart2P";
+			ctx.fillStyle = Color.menuText;
+
+			ctx.drawImage(title_logo1, 320, 180);
+
+			Game.flicker += 1;
+			if (Game.flicker % 80 == 0) {
+				ctx.fillStyle = "#ccf";
+				Game.flicker=0;
+			}
+			else { ctx.fillStyle = Color.infotext; }
+			ctx.fillText("→", Game.arrow, 380);
+			ctx.fillStyle = Color.menuText;
+
+			ctx.fillText("start", 300, 380);
+			ctx.fillText("about", 400, 380);
+			ctx.fillText("ctrls", 500, 380);
+			ctx.fillText("----", 600, 380);
+			ctx.fillStyle = Color.infotext;
+			ctx.fillText(Game.helpText, 350, 600);
+
+		 }; // end of titleScreen
+
+		Game.loadingText = "Loading...";
+
+		Game.load = function() {
+
+			ctx.fillStyle = Color.background;
+			ctx.fillRect(0,0, canvas.width, canvas.height);
+			ctx.font = "normal 14px PressStart2P";
+			ctx.fillStyle = Color.infotext;
+			ctx.drawImage(title_logo1, 320, 180);
+			//Render of loading Screen
+
+			ctx.fillStyle = Color.infotext;
+			ctx.fillText(Game.loadingText, (350 - Game.loadingText.length*3), 400);
+			if (Map.made === false) {
+				Map.makeMap();
+				Screen.select();
+				Player.spawn();
+			}
+			if (Screen.tilesLoaded === true) { Game.loadingText = "Drawing..."; Game.mode = 2; }
+		 };
+		Game.checkState = function() {
+			Game.clockTick = this.timer.tick();
+			// Other data items that need updating should be here.
+		 };
+
+		Game.init = function() {
+			ctx.fillStyle = "#111112";
+			ctx.fillRect(Screen.selected.length*(-50), Screen.selected.length*(-50), (Screen.selected.length*50)*2+100, (Screen.selected.length*50)*2+100);
+			ctx.fillStyle = Color.infotext;
+			Screen.drawTiles();
+			Player.draw();
+			Game.debug.grid();
+			//ctx.fillText(Game.loadingText, Math.abs(Screen.x)+canvas.width - 130, Math.abs(Screen.y)+20);
+			
+
+		 };
+
+		Game.debug = {};
+		Game.debug.grid = function() {
+			ctx.beginPath();
+			
+			for (var vert = 0, vertCap = 128; vert < vertCap; vert++) {		
+				ctx.moveTo(vert*50,0)		
+				ctx.lineTo(vert*50, 128*50);
+			}
+			ctx.lineWidth = 2;
+			for (var hor = 0, horCap = 128; hor < horCap; hor++) {		
+				ctx.moveTo(0,hor*50)		
+				ctx.lineTo(128*50, hor*50);
+			}
+			ctx.strokeStyle = "#422";
+			ctx.stroke();
+		};
+
+
+
+
 
 
 	/****** Content  ******************************/
-
 
 	function imageLoad() {
 		imagesLoaded += 1;
 
 		//  a 'wait' for all images to load
-
 		if (imagesLoaded === imageCount) {
+
 			// shim layer with setTimeout fallback
 			window.requestAnimFrame = (function(){
 				return  window.requestAnimationFrame   || 
@@ -347,105 +491,13 @@ var init = function() {
 			})();
 			(function animloop(){
 				requestAnimFrame(animloop);
-				drawScreen();
-			})();
+				Game.drawScreen();
+			}) ();
+			
 		 }
-	 }; // end of imageLoad()
+	 };
 
-
-	function drawScreen() {
-		console.log("drawn");
-		if (gameMode === 0) titleScreen();
-		if (gameMode === 1) loadGame();
-		if (gameMode === 2) game();
-	}; // End of drawscreen()
-
-
-	// Globals for title screen
-	var arrowPosition = 275,
-		  helpText = "Press ENTER to select.",
-		  flicker = 0;
-
-
-	function titleScreen() {
-
-		titleSetControls();
-		//rendered screen
-
-		ctx.fillStyle = bgColor;
-		ctx.fillRect(0,0, canvas.width, canvas.height);
-		ctx.font = "normal 14px PressStart2P";
-		ctx.fillStyle = menuText;
-
-		ctx.drawImage(title_logo1, 320, 180);
-
-		flicker += 1;
-		if (flicker % 80 == 0) {
-			ctx.fillStyle = "#ccf";
-			flicker=0;
-		}
-		else { ctx.fillStyle = lightText; }
-		ctx.fillText("→", arrowPosition, 380);
-		ctx.fillStyle = menuText;
-
-		ctx.fillText("start", 300, 380);
-		ctx.fillText("about", 400, 380);
-		ctx.fillText("ctrls", 500, 380);
-		ctx.fillText("----", 600, 380);
-		ctx.fillStyle = lightText;
-		ctx.fillText(helpText, 350, 600);
-
-	}; // end of titleScreen
-
-
-
-
-	var loadingText = "Loading...",
-	loadingColor = 0; //counter for loading screen effect
-
-	function loadGame() {
-
-		ctx.fillStyle = bgColor;
-		ctx.fillRect(0,0, canvas.width, canvas.height);
-		ctx.font = "normal 14px PressStart2P";
-		ctx.fillStyle = lightText;
-		ctx.drawImage(title_logo1, 320, 180);
-
-		//Render of loading Screen
-		if (loadingColor <= 30) {
-			loadingColor += 1;
-			ctx.fillStyle = lightText;
-		}
-		else {
-			loadingColor = 0;
-			ctx.fillStyle = "#ccc";
-		}
-
-		ctx.fillText(loadingText, (350 - loadingText.length*3), 400);
-		if (map.made === false) {
-			map.makeMap();
-			screen.select();
-			//player.spawn();
-
-		}
-
-		if (screen.tilesLoaded === true) { gameMode = 2; }
-
-
-	}; //end of loadGame
-
-	function game() {
-		ctx.fillStyle = bgColor;
-		ctx.fillRect(screen.selected.length*(-50), screen.selected.length*(-50), (screen.selected.length*50)*2+100, (screen.selected.length*50)*2+100);
-		ctx.fillStyle = lightText;
-		ctx.fillText("Drawing...", 20, 20);
-
-		//pan();
-		screen.drawTiles();
-	};
-
-	drawScreen();
-
+	Game.drawScreen();
 }; // end of init()
 
 document.addEventListener('DOMContentLoaded', init, false);
