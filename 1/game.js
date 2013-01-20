@@ -35,7 +35,6 @@ var init = function() {
 	};
 
 
-
 	/******************** title ********************/
 
 	function titleSetControls() {
@@ -49,10 +48,10 @@ var init = function() {
 		$(document).bind('keyup.right', menu_d_button);
 		$(document).bind('keyup.return', menu_return_button);
 
-		$(document).bind('keyup.u', pan_up);
-		$(document).bind('keyup.h', pan_left);
-		$(document).bind('keyup.j', pan_down);
-		$(document).bind('keyup.k', pan_right);
+		$(document).bind('keyup.u', pan_down);
+		$(document).bind('keyup.h', pan_right);
+		$(document).bind('keyup.j', pan_up);
+		$(document).bind('keyup.k', pan_left);
 
 	 }; 
 		function menu_a_button() {
@@ -86,24 +85,119 @@ var init = function() {
 	};
 	/******************** GAME ********************/
 
+
 	function gameSetControls() {
 		//  Controls
 		gameSetControls = Function("");  //insures only runs once.
-		$(document).bind('keydown.w', game_w_button);
-		$(document).bind('keydown.s', game_s_button);
-		$(document).bind('keydown.a', game_a_button);
-		$(document).bind('keydown.d', game_d_button);
-		$(document).bind('keydown.up', game_w_button);
-		$(document).bind('keydown.down', game_s_button);
-		$(document).bind('keydown.left', game_a_button);
-		$(document).bind('keydown.right', game_d_button);
+		$(document).bind('keyup.w', game_w_button);
+		$(document).bind('keyup.s', game_s_button);
+		$(document).bind('keyup.a', game_a_button);
+		$(document).bind('keyup.d', game_d_button);
+		$(document).bind('keyup.up', game_w_button);
+		$(document).bind('keyup.down', game_s_button);
+		$(document).bind('keyup.left', game_a_button);
+		$(document).bind('keyup.right', game_d_button);
 		$(document).bind('keyup.return', game_return_button);
+		$(document).bind('keyup.space', game_space_button);
 	 };
-	function game_w_button() {};
-	function game_a_button() {};
-	function game_s_button() {};
-	function game_d_button() {};
+	function game_w_button() {
+		Player.animState = 9;
+		var interval = 25, //ms
+			calls = 0,
+			limit = 1;
+		function moveChar() {
+			if (calls < limit) {
+					if (Player.animState === 11) {Player.animState = 9;}
+					else Player.animState+=1;
+				
+					calls += 1/interval;
+					Player.y -= 1/interval;
+					requestAnimationFrame(moveChar);
+					//moveChar();
+			}
+			else return;
+
+		 };
+		moveChar();
+		pan_down();
+		Screen.center -= 128;
+		console.log(Screen.center);
+		Screen.select();
+	};
+	function game_a_button() {
+		Player.animState = 3;
+		var interval = 25, //ms
+			calls = 0,
+			limit = 1;
+		function moveChar() {
+			if (calls < limit) {
+					if (Player.animState === 5) {Player.animState = 3;}
+					else Player.animState+=1;
+					calls += 1/interval;
+					Player.x -= 1/interval;
+					requestAnimationFrame(moveChar);
+					//moveChar();
+			}
+			else return;
+
+		 };
+		moveChar();
+		pan_right();
+		Player.animState = 3;
+		Screen.center -= 1;
+		Screen.select();
+	};
+	function game_s_button() {
+		Player.animState = 0;
+		var interval = 25, //ms
+			calls = 0,
+			limit = 1;
+		function moveChar() {
+			if (calls < limit) {
+					if (Player.animState === 2) {Player.animState = 0;}
+					else Player.animState+=1;
+					calls += 1/interval;
+					Player.y += 1/interval;
+					requestAnimationFrame(moveChar);
+					//moveChar();
+			}
+			else return;
+
+		 };
+		moveChar();
+		pan_up();
+		Player.animState = 0;
+		Screen.center += 128;
+		Screen.select();
+	};
+	function game_d_button() {
+		Player.animState = 6;
+		var interval = 25, //ms
+			calls = 0,
+			limit = 1;
+		function moveChar() {
+			if (calls < limit) {
+					if (Player.animState === 8) {Player.animState = 6;}
+					else Player.animState+=1;
+					calls += 1/interval;
+					Player.x += 1/interval;
+					requestAnimationFrame(moveChar);
+					//moveChar();
+			}
+			else return;
+
+		 };
+		moveChar();
+		pan_left();
+		Player.animState = 6;
+		Screen.center += 1;
+		Screen.select();
+
+	};
 	function game_return_button() {};
+	function game_space_button() {
+		pan(Player.x*0, Player.y*0);
+	};
 
 	function pan_up() {
 
@@ -129,23 +223,19 @@ var init = function() {
 			Screen.moveToY = newY;
 			Screen.x += Screen.moveToX;
 			Screen.y += Screen.moveToY;
-			
-			var a = 0;
-			var move = function() {
 
-				if ( a < 50 ) {
-					a += 1;
-					ctx.translate(Screen.moveToX/50, Screen.moveToY/50);
-				}
-				else if (a === 50) {
-					window.clearInterval(panInterval);
-					a = 0;
-					Screen.moveToX = 0;
-					Screen.moveToY = 0;
-				}
-			}
-			var panInterval = window.setInterval(move, 1000/60);
-				
+		var interval = 50, //ms
+		calls = 0,
+		limit = 1;
+		function moveCam() {
+			if (calls < limit) {
+					calls += 1/interval;
+					ctx.translate(Screen.moveToX/interval, Screen.moveToY/interval);
+					requestAnimationFrame(moveCam);
+			 }
+			else return;
+		 };
+		moveCam();
 			
 		}
 		else {
@@ -167,29 +257,35 @@ var init = function() {
 	/****** Images  ******************************/
 
 	var imagesLoaded = 0,
-			imageCount = 7,
+			imageCount = 9,
 			grass1 = new Image(),
 			grass2 = new Image(),
 			grass3 = new Image(),
 			grass4 = new Image(),
+			tree1 = new Image(),
 			hero_img = new Image(),
 			title_logo1 = new Image(),
 			title_logo2 = new Image();
+			skybox = new Image();
 
 	grass1.src = "res/world/grass_1.png";
 	grass2.src = "res/world/grass_2.png";
 	grass3.src = "res/world/grass_3.png";
 	grass4.src = "res/world/grass_4.png";
-	hero_img.src = "res/heros/character1.png";
+	tree1.src = "res/world/tree_1.png";
+	hero_img.src = "res/heros/c1_spritesheet.png";
 	title_logo1.src = "res/title5.png";
 	title_logo2.src = "res/title4.png";
+	skybox.src = "res/world/skybox.png";
 	grass1.addEventListener('load', imageLoad, false);
 	grass2.addEventListener('load', imageLoad, false);
 	grass3.addEventListener('load', imageLoad, false);
 	grass4.addEventListener('load', imageLoad, false);
+	tree1.addEventListener('load', imageLoad, false);
 	hero_img.addEventListener('load', imageLoad, false);
 	title_logo1.addEventListener('load', imageLoad, false);
 	title_logo2.addEventListener('load', imageLoad, false);
+	skybox.addEventListener('load', imageLoad, false);
 
 
 
@@ -227,7 +323,8 @@ var init = function() {
 		else { this.image = ~~(Math.random() * 4); }
 		Map.tiles += 1;
 	 };
-	Map.data = new Array();
+	Map.data = [];
+	Map.edge = [];
 	Map.tileSize = 50;
 	Map.made = false;
 	Map.makeMap = function() {
@@ -245,8 +342,25 @@ var init = function() {
 		}
 		var result = (new Date() - myDate);
 		Game.loadingText = (Map.tiles + " tiles loaded in " + result + " milliseconds.");
-		console.log(Map.data);
+		//console.log(Map.data);
+
+	/*	 Make an array of map bounderies to check against later */
+		for (var i = 0, ii = Map.data.length; i < ii; i++) {
+			if (Map.data[i].x === 1 || Map.data[i].x === 2) {
+				Map.edge.push(i);
+			}
+			else if (Map.data[i].x === 127 || Map.data[i].x === 128) {
+				Map.edge.push(i);
+			}
+			else if (Map.data[i].y === 1 || Map.data[i].y === 2) {
+				Map.edge.push(i);
+			}
+			else if (Map.data[i].y === 127 || Map.data[i].y === 128) {
+				Map.edge.push(i);
+			}
+		}
 		Map.made = true;
+		console.log(Map.edge);
 		
 	};
 	Map.draw = function() {
@@ -257,7 +371,7 @@ var init = function() {
 
 /**/var Screen = {};
 
-		Screen.center = 1200;
+		Screen.center = 1200+(128*9);
 		Screen.moveToX = 0;
 		Screen.moveToY = 0;
 		Screen.x = 0;			//keeps track of the Screen position
@@ -265,19 +379,32 @@ var init = function() {
 		Screen.selected = [];
 		Screen.select = function() {
 
+			Screen.selected.length = 0;
 			var center = Screen.center;
 
 			/*debug*/	//console.log("Center: "+center);
 
 			var bottomRightCorner = (center+11)+(Map.width*8);
-			if ( bottomRightCorner < 0 ) { return console.log("Need to generate more tiles."); }
+			if ( bottomRightCorner > 128*128 ) {
+				do {
+					console.log("Need to generate more tiles.");
+					bottomRightCorner-=128;
+				 }
+				while (bottomRightCorner > 128*128 ) 
+			 }
 
 			///*debug*/	console.log("Bottom Right: "+bottomRightCorner);
 			///*debug*/	console.log("Bottom Right X: "+Map.data[bottomRightCorner].x);
 			///*debug*/	console.log("Bottom Right Y: "+Map.data[bottomRightCorner].y);
 			var topLeftCorner = (center-11)-(Map.width*8);
 
-			if ( topLeftCorner < 0 ) { return console.log("Need to generate more tiles."); }
+			if ( topLeftCorner < 0 ) {
+				do {
+					console.log("Need to generate more tiles.");
+					topLeftCorner+=128;
+				 }
+				while (topLeftCorner < 0 ) 
+			 }
 			///*debug*/console.log("Top Left: "+topLeftCorner);
 			///*debug*/console.log("Top Left X: "+Map.data[topLeftCorner].x);
 
@@ -292,23 +419,34 @@ var init = function() {
 
 				}
 			Screen.tilesLoaded = true;
-			console.log(Screen.selected);	
-		};
+			//console.log(Screen.selected);	
+		 };
 		Screen.tilesLoaded = false;
 		Screen.loadTiles = function() { };
 		Screen.move = function() { };
 		Screen.drawTiles = function() {
-
 			Screen.SetScreenInitially();
 
 			for (var i = 0, ii = Screen.selected.length; i < ii; i++) {
 
-				var grassRoll = Math.random();
-				if (grassRoll > .35) ctx.drawImage(grass4, Screen.selected[i].x*Map.tileSize, Screen.selected[i].y*Map.tileSize);
-				//if (grassRoll < .65) ctx.drawImage(grass3, Screen.selected[i].x*Map.tileSize, Screen.selected[i].y*Map.tileSize);
+				ctx.fillStyle = "#337";
+				if (Screen.selected[i].x === 12 || Screen.selected[i].x === 118) {
+					ctx.drawImage(tree1, ( (Screen.selected[i].x)*Map.tileSize), ((Screen.selected[i].y)*Map.tileSize) );
+					//ctx.fillRect( Screen.selected[i].x*Map.tileSize, Screen.selected[i].y*Map.tileSize, 50, 50);
+				}
+				else if (Screen.selected[i].y === 12 || Screen.selected[i].y === 118) {
+					//ctx.drawImage(tree1, ( (Screen.selected[i].x)*Map.tileSize), ((Screen.selected[i].y)*Map.tileSize) );
+				}
+				else if (Screen.selected[i].x < 12 || Screen.selected[i].x > 118) {
+					ctx.drawImage(tree1, ( (Screen.selected[i].x)*Map.tileSize), ((Screen.selected[i].y)*Map.tileSize) );
+				 }
+				else if (Screen.selected[i].y < 12 || Screen.selected[i].y > 118) {
+					ctx.drawImage(tree1, ( (Screen.selected[i].x)*Map.tileSize), ((Screen.selected[i].y)*Map.tileSize) );
+				 }
+
 				else ctx.drawImage(grass4, Screen.selected[i].x*Map.tileSize, Screen.selected[i].y*Map.tileSize);
 				
-			}
+			 }
 
 		};
 		Screen.SetScreenInitially = function() {
@@ -326,6 +464,7 @@ var init = function() {
 		Player.isOnTile = 0;
 		Player.spawnTile = 0;
 		Player.set = false;
+		Player.animState = 0;
 
 		Player.spawn = function() {
 			Player.SetScreenInitially = Function(""); //rewrite the function
@@ -337,13 +476,15 @@ var init = function() {
 		};
 
 		Player.draw = function() {
-			ctx.drawImage(hero_img, Player.x*50, (Player.y*50)-10);
+		//	drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+			ctx.drawImage(hero_img, Player.animState*50, 0, 50, 60, Player.x*50, (Player.y*50)-10, 50, 60);
 
 		};
 
 
 
 /**/var Entity = {};
+		// Player currently is not added as an entity.
 		Entity.all = [];
 		Entity.add = function(entity) {
 			Entity.all.push(entity);
@@ -377,7 +518,7 @@ var init = function() {
 			Game.checkState();
 			if (Game.mode === 0) Game.titleScreen();
 			if (Game.mode === 1) Game.load();
-			if (Game.mode === 2) { Game.init();}
+			if (Game.mode === 2) { gameSetControls(); Game.init();}
 		 };
 		Game.arrow = 275;
 		Game.helpText = "Press ENTER to select.";
@@ -437,12 +578,15 @@ var init = function() {
 		 };
 
 		Game.init = function() {
-			ctx.fillStyle = "#111112";
+
+			ctx.fillStyle = "#224e1c";
 			ctx.fillRect(Screen.selected.length*(-50), Screen.selected.length*(-50), (Screen.selected.length*50)*2+100, (Screen.selected.length*50)*2+100);
+			//ctx.drawImage(skybox, Screen.selected.length*(-50), Screen.selected.length*(-50), (Screen.selected.length*50)*3+100, (Screen.selected.length*50)*3+100);
+
 			ctx.fillStyle = Color.infotext;
 			Screen.drawTiles();
+			//Game.debug.grid();
 			Player.draw();
-			Game.debug.grid();
 			//ctx.fillText(Game.loadingText, Math.abs(Screen.x)+canvas.width - 130, Math.abs(Screen.y)+20);
 			
 
@@ -461,7 +605,7 @@ var init = function() {
 				ctx.moveTo(0,hor*50)		
 				ctx.lineTo(128*50, hor*50);
 			}
-			ctx.strokeStyle = "#422";
+			ctx.strokeStyle = "#242";
 			ctx.stroke();
 		};
 
@@ -488,7 +632,7 @@ var init = function() {
 				function( callback ){
 					window.setTimeout(callback, 1000 / 60);
 				};
-			})();
+			} )();
 			(function animloop(){
 				requestAnimFrame(animloop);
 				Game.drawScreen();
