@@ -371,20 +371,22 @@ var init = function() {
 
 /**/var Screen = {};
 
-		Screen.center = 1200+(128*9);
+		Screen.center = 1200+(128*10);
 		Screen.moveToX = 0;
 		Screen.moveToY = 0;
 		Screen.x = 0;			//keeps track of the Screen position
 		Screen.y = 0;
 		Screen.selected = [];
+		Screen.loadMargin = 0;
 		Screen.select = function() {
 
 			Screen.selected.length = 0;
 			var center = Screen.center;
 
+
 			/*debug*/	//console.log("Center: "+center);
 
-			var bottomRightCorner = (center+11)+(Map.width*8);
+			var bottomRightCorner = (center+(11+Screen.loadMargin))+(Map.width*(8+Screen.loadMargin));
 			if ( bottomRightCorner > 128*128 ) {
 				do {
 					console.log("Need to generate more tiles.");
@@ -396,7 +398,8 @@ var init = function() {
 			///*debug*/	console.log("Bottom Right: "+bottomRightCorner);
 			///*debug*/	console.log("Bottom Right X: "+Map.data[bottomRightCorner].x);
 			///*debug*/	console.log("Bottom Right Y: "+Map.data[bottomRightCorner].y);
-			var topLeftCorner = (center-11)-(Map.width*8);
+			var topLeftCorner = (center-(11))-(Map.width*(8));
+
 
 			if ( topLeftCorner < 0 ) {
 				do {
@@ -418,8 +421,9 @@ var init = function() {
 					if (i >= (bottomRightCorner)) break;
 
 				}
+				console.log(Map.data[Screen.center].x,Map.data[Screen.center].y);
 			Screen.tilesLoaded = true;
-			//console.log(Screen.selected);	
+			console.log(Screen.selected);	
 		 };
 		Screen.tilesLoaded = false;
 		Screen.loadTiles = function() { };
@@ -453,8 +457,10 @@ var init = function() {
 
 				Screen.SetScreenInitially = Function("");	//	rewrite the function
 				//console.log("Set to " + Screen.selected[0].x*-50 + ", " + Screen.selected[0].y*-50);
-				Screen.moveToX = Screen.selected[24].x*-50;
-				Screen.moveToY =  Screen.selected[24].y*-50;
+				
+				Screen.moveToX = Screen.selected[47].x*-50;		// +23 for a new row
+				Screen.moveToY =  Screen.selected[47].y*-50;	// +23 for a new row
+
 				pan();
 
 			};
@@ -472,7 +478,6 @@ var init = function() {
 			Player.y = Map.data[Screen.center].y;
 			Player.isOnTile = Screen.center;
 			Player.spawnTile = Screen.center;
-			console.log(" ");
 		};
 
 		Player.draw = function() {
@@ -579,10 +584,9 @@ var init = function() {
 
 		Game.init = function() {
 
-			ctx.fillStyle = "#224e1c";
+			ctx.fillStyle = "#181818";
 			ctx.fillRect(Screen.selected.length*(-50), Screen.selected.length*(-50), (Screen.selected.length*50)*2+100, (Screen.selected.length*50)*2+100);
 			//ctx.drawImage(skybox, Screen.selected.length*(-50), Screen.selected.length*(-50), (Screen.selected.length*50)*3+100, (Screen.selected.length*50)*3+100);
-
 			ctx.fillStyle = Color.infotext;
 			Screen.drawTiles();
 			//Game.debug.grid();
@@ -605,7 +609,7 @@ var init = function() {
 				ctx.moveTo(0,hor*50)		
 				ctx.lineTo(128*50, hor*50);
 			}
-			ctx.strokeStyle = "#242";
+			ctx.strokeStyle = "#111";
 			ctx.stroke();
 		};
 
