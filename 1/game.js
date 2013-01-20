@@ -107,13 +107,14 @@ var init = function() {
 			limit = 1;
 		function moveChar() {
 			if (calls < limit) {
+				if (calls % (1/interval)*2 === 0) {
 					if (Player.animState === 11) {Player.animState = 9;}
 					else Player.animState+=1;
-				
-					calls += 1/interval;
-					Player.y -= 1/interval;
-					requestAnimationFrame(moveChar);
-					//moveChar();
+				 }
+				calls += 1/interval;
+				Player.y -= 1/interval;
+				requestAnimationFrame(moveChar);
+				//moveChar();
 			}
 			else return;
 
@@ -131,12 +132,14 @@ var init = function() {
 			limit = 1;
 		function moveChar() {
 			if (calls < limit) {
+				if (calls % (1/interval)*2 === 0) {
 					if (Player.animState === 5) {Player.animState = 3;}
 					else Player.animState+=1;
-					calls += 1/interval;
-					Player.x -= 1/interval;
-					requestAnimationFrame(moveChar);
-					//moveChar();
+				 }
+				calls += 1/interval;
+				Player.x -= 1/interval;
+				requestAnimationFrame(moveChar);
+				//moveChar();
 			}
 			else return;
 
@@ -154,11 +157,13 @@ var init = function() {
 			limit = 1;
 		function moveChar() {
 			if (calls < limit) {
-					if (Player.animState === 2) {Player.animState = 0;}
-					else Player.animState+=1;
-					calls += 1/interval;
-					Player.y += 1/interval;
-					requestAnimationFrame(moveChar);
+				if (calls % (1/interval)*2 === 0) {
+						if (Player.animState === 2) {Player.animState = 0;}
+						else Player.animState+=1;
+				 }
+				calls += 1/interval;
+				Player.y += 1/interval;
+				requestAnimationFrame(moveChar);
 					//moveChar();
 			}
 			else return;
@@ -177,12 +182,14 @@ var init = function() {
 			limit = 1;
 		function moveChar() {
 			if (calls < limit) {
-					if (Player.animState === 8) {Player.animState = 6;}
-					else Player.animState+=1;
-					calls += 1/interval;
-					Player.x += 1/interval;
-					requestAnimationFrame(moveChar);
-					//moveChar();
+				if (calls % (1/interval)*2 === 0) {
+						if (Player.animState === 8) {Player.animState = 6;}
+						else Player.animState+=1;
+				 }
+				calls += 1/interval;
+				Player.x += 1/interval;
+				requestAnimationFrame(moveChar);
+				//moveChar();
 			}
 			else return;
 
