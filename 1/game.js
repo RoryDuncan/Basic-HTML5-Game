@@ -270,6 +270,7 @@ var init = function() {
 			grass3 = new Image(),
 			grass4 = new Image(),
 			tree1 = new Image(),
+			tree2 = new Image(),
 			hero_img = new Image(),
 			title_logo1 = new Image(),
 			title_logo2 = new Image();
@@ -280,6 +281,7 @@ var init = function() {
 	grass3.src = "res/world/grass_3.png";
 	grass4.src = "res/world/grass_4.png";
 	tree1.src = "res/world/tree_1.png";
+	tree2.src = "res/world/tree_2.png";
 	hero_img.src = "res/heros/c1_spritesheet.png";
 	title_logo1.src = "res/title5.png";
 	title_logo2.src = "res/title4.png";
@@ -289,6 +291,7 @@ var init = function() {
 	grass3.addEventListener('load', imageLoad, false);
 	grass4.addEventListener('load', imageLoad, false);
 	tree1.addEventListener('load', imageLoad, false);
+	tree2.addEventListener('load', imageLoad, false);
 	hero_img.addEventListener('load', imageLoad, false);
 	title_logo1.addEventListener('load', imageLoad, false);
 	title_logo2.addEventListener('load', imageLoad, false);
@@ -442,23 +445,38 @@ var init = function() {
 
 				ctx.fillStyle = "#337";
 				if (Screen.selected[i].x === 12 || Screen.selected[i].x === 118) {
-					ctx.drawImage(tree1, ( (Screen.selected[i].x)*Map.tileSize), ((Screen.selected[i].y)*Map.tileSize) );
+					ctx.drawImage(tree2, ( (Screen.selected[i].x)*Map.tileSize), ((Screen.selected[i].y)*Map.tileSize) );
+					//ctx.drawImage(tree1, ( (Screen.selected[i].x+1)*Map.tileSize), ((Screen.selected[i].y)*Map.tileSize) );
 					//ctx.fillRect( Screen.selected[i].x*Map.tileSize, Screen.selected[i].y*Map.tileSize, 50, 50);
 				}
 				else if (Screen.selected[i].y === 12 || Screen.selected[i].y === 118) {
 					//ctx.drawImage(tree1, ( (Screen.selected[i].x)*Map.tileSize), ((Screen.selected[i].y)*Map.tileSize) );
 				}
 				else if (Screen.selected[i].x < 12 || Screen.selected[i].x > 118) {
-					ctx.drawImage(tree1, ( (Screen.selected[i].x)*Map.tileSize), ((Screen.selected[i].y)*Map.tileSize) );
+					ctx.drawImage(tree2, ( (Screen.selected[i].x)*Map.tileSize), ((Screen.selected[i].y)*Map.tileSize) );
 				 }
 				else if (Screen.selected[i].y < 12 || Screen.selected[i].y > 118) {
-					ctx.drawImage(tree1, ( (Screen.selected[i].x)*Map.tileSize), ((Screen.selected[i].y)*Map.tileSize) );
+					ctx.drawImage(tree2, ( (Screen.selected[i].x)*Map.tileSize), ((Screen.selected[i].y)*Map.tileSize) );
 				 }
 
+				//else if (Screen.selected[i].image === 1) ctx.drawImage(tree1, (Screen.selected[i].x)*Map.tileSize, (Screen.selected[i].y-1)*Map.tileSize);
 				else ctx.drawImage(grass4, Screen.selected[i].x*Map.tileSize, Screen.selected[i].y*Map.tileSize);
 				
 			 }
 
+		};
+		Screen.drawMiddle = function() {
+			for (var i = 0, ii = Screen.selected.length; i < ii; i++) {
+													//drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+				if (Screen.selected[i].image === 1) ctx.drawImage(tree2, 50, 100, 50, 50, (Screen.selected[i].x)*Map.tileSize, (Screen.selected[i].y)*Map.tileSize, 50, 50);
+				else continue;
+			}
+		};
+		Screen.drawForeground = function() {
+			for (var i = 0, ii = Screen.selected.length; i < ii; i++) {
+												//drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+				if (Screen.selected[i].image === 1) ctx.drawImage(tree2, 0, 0, 150, 100, (Screen.selected[i].x-1)*Map.tileSize, (Screen.selected[i].y-2)*Map.tileSize, 150, 100);
+			}
 		};
 		Screen.SetScreenInitially = function() {
 
@@ -591,13 +609,15 @@ var init = function() {
 
 		Game.init = function() {
 
-			ctx.fillStyle = "#181818";
+			ctx.fillStyle = "#254027";
 			ctx.fillRect(Screen.selected.length*(-50), Screen.selected.length*(-50), (Screen.selected.length*50)*2+100, (Screen.selected.length*50)*2+100);
 			//ctx.drawImage(skybox, Screen.selected.length*(-50), Screen.selected.length*(-50), (Screen.selected.length*50)*3+100, (Screen.selected.length*50)*3+100);
 			ctx.fillStyle = Color.infotext;
 			Screen.drawTiles();
 			//Game.debug.grid();
+			Screen.drawMiddle();
 			Player.draw();
+			Screen.drawForeground();
 			//ctx.fillText(Game.loadingText, Math.abs(Screen.x)+canvas.width - 130, Math.abs(Screen.y)+20);
 			
 
