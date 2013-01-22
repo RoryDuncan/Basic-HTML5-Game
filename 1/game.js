@@ -323,14 +323,15 @@ var init = function() {
 	Map.height = 128;
 	Map.width = 128;
 	Map.tiles = 0, //the area of the Map.
-	Tile = function(number, xpos, ypos, indx) { //constructor
+	Tile = function(number, xpos, ypos) { //constructor
 		this.id = number; 
 		this.x = xpos;
 		this.y = ypos;
-		if (indx) {
-			this.image = indx;
-		}
-		else { this.image = ~~(Math.random() * 4); }
+		var random = Math.random()*10;
+		if (random < .15) this.image = 2;					//15%
+		if (random > .15 && random < .5 ) this.image = 1;	//35%
+		if (random > .5 && random < .75) this.image = 3;	//25%
+		if (random > .75 && random < 1) this.image = 5;					//25%
 		Map.tiles += 1;
 	 };
 	Map.data = [];
@@ -387,14 +388,29 @@ var init = function() {
 		Screen.x = 0;			//keeps track of the Screen position
 		Screen.y = 0;
 		Screen.selected = [];
-		Screen.loadMargin = 0;
+		Screen.loadMargin = 3;
+		Screen.dimensions = {};
+		Screen.dimensions.row = 0;
+		Screen.dimensions.col = 0;
 		Screen.select = function() {
-
+			/*			This program selects the tiles to be loaded, and displayed.			*/
+			/*			The tile shown is determined by	Map.data[]							*/
 			Screen.selected.length = 0;
+
 			var center = Screen.center;
 
+			var rowLength =  1 + (11*2) + (Screen.loadMargin*2);
 
-			/*debug*/	//console.log("Center: "+center);
+			Screen.dimensions.row =  rowLength;
+
+			var columnLength = 1 + (8*2) + (Screen.loadMargin*2);
+
+			Screen.dimensions.col = columnLength;
+
+			console.log((rowLength*columnLength)/2);
+			Screen.area = rowLength*columnLength;
+
+			/*debug*/	console.log("Center: "+center);
 
 			var bottomRightCorner = (center+(11+Screen.loadMargin))+(Map.width*(8+Screen.loadMargin));
 			if ( bottomRightCorner > 128*128 ) {
@@ -405,10 +421,10 @@ var init = function() {
 				while (bottomRightCorner > 128*128 ) 
 			 }
 
-			///*debug*/	console.log("Bottom Right: "+bottomRightCorner);
+			/*debug*/	console.log("Bottom Right: "+bottomRightCorner);
 			///*debug*/	console.log("Bottom Right X: "+Map.data[bottomRightCorner].x);
 			///*debug*/	console.log("Bottom Right Y: "+Map.data[bottomRightCorner].y);
-			var topLeftCorner = (center-(11))-(Map.width*(8));
+			var topLeftCorner = (center-(11+Screen.loadMargin))-(Map.width*(8+Screen.loadMargin));
 
 
 			if ( topLeftCorner < 0 ) {
@@ -418,20 +434,24 @@ var init = function() {
 				 }
 				while (topLeftCorner < 0 ) 
 			 }
-			///*debug*/console.log("Top Left: "+topLeftCorner);
+			/*debug*/console.log("Top Left: "+topLeftCorner);
 			///*debug*/console.log("Top Left X: "+Map.data[topLeftCorner].x);
 
-			for (var i = topLeftCorner, xx = (Map.data[bottomRightCorner].x - Map.data[topLeftCorner].x)+1, counter = 0;  /*i < bottomRightCorner*/ counter < 391; i++, counter++) {
+			for (var i = topLeftCorner, xx = (Map.data[bottomRightCorner].x - Map.data[topLeftCorner].x), counter = 0;  /*i < bottomRightCorner*/ counter < (rowLength*columnLength); i++, counter++) {
 					if ( counter % (xx) === 0  && counter != 0) {
-						//console.log("From " + i + " to " + (i+ ( 128 - xx ) ) );
+						console.log("From " + i + " to " + (i+ ( 128 - xx ) ) );
 						i+=(128 - (xx));
 					 }
 					var data = Map.data[i];
 					Screen.selected.push(data);
-					if (i >= (bottomRightCorner)) break;
+					if (i === Screen.center) {console.log("Center!!! :" + Screen.selected.length);}
+					if (i === bottomRightCorner - (128 - xx) ) break;
 
 				}
-				console.log(Map.data[Screen.center].x,Map.data[Screen.center].y);
+				var centerVal = Screen.selected.length;
+				console.log(Screen.selected.length);
+				//console.log("----X:   screen center: " + Map.data[Screen.center].x + " vs centerVal: " + Map.data[centerVal].x + "." );
+				//console.log("----Y:   screen center: " + Map.data[Screen.center].y + " vs centerVal: " + Map.data[centerVal].y + "." );
 			Screen.tilesLoaded = true;
 			console.log(Screen.selected);	
 		 };
@@ -460,6 +480,7 @@ var init = function() {
 				 }
 
 				//else if (Screen.selected[i].image === 1) ctx.drawImage(tree1, (Screen.selected[i].x)*Map.tileSize, (Screen.selected[i].y-1)*Map.tileSize);
+				else if (Screen.selected[i].image === 2) ctx.drawImage(grass1, Screen.selected[i].x*Map.tileSize, Screen.selected[i].y*Map.tileSize);
 				else ctx.drawImage(grass4, Screen.selected[i].x*Map.tileSize, Screen.selected[i].y*Map.tileSize);
 				
 			 }
@@ -482,9 +503,14 @@ var init = function() {
 
 				Screen.SetScreenInitially = Function("");	//	rewrite the function
 				//console.log("Set to " + Screen.selected[0].x*-50 + ", " + Screen.selected[0].y*-50);
-				
-				Screen.moveToX = Screen.selected[47].x*-50;		// +23 for a new row
-				Screen.moveToY =  Screen.selected[47].y*-50;	// +23 for a new row
+
+
+				Screen.moveToX = 1050/2;
+				Screen.moveToY =  750/2;	
+				pan();
+
+				Screen.moveToX = (Map.data[Screen.center].x*-50);
+				Screen.moveToY =  (Map.data[Screen.center].y*-50);	
 
 				pan();
 
@@ -501,13 +527,12 @@ var init = function() {
 			Player.SetScreenInitially = Function(""); //rewrite the function
 			Player.x = Map.data[Screen.center].x;
 			Player.y = Map.data[Screen.center].y;
-			Player.isOnTile = Screen.center;
 			Player.spawnTile = Screen.center;
 		};
 
 		Player.draw = function() {
 		//	drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
-			ctx.drawImage(hero_img, Player.animState*50, 0, 50, 60, Player.x*50, (Player.y*50)-10, 50, 60);
+			ctx.drawImage(hero_img, Player.animState*50, 0, 50, 60, Player.x*50, (Player.y*50), 37, 45);
 
 		};
 

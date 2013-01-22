@@ -6,7 +6,7 @@ Monthly Projects for One Game a Month
 #January
 
 ##			Wilderlands
-RPG in which you wander a forest and recruit animal allies.
+	RPG in which you wander a forest and recruit animal allies.
 
 #February
 
