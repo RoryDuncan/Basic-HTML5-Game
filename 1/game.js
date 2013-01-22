@@ -328,10 +328,10 @@ var init = function() {
 		this.x = xpos;
 		this.y = ypos;
 		var random = Math.random()*10;
-		if (random < .15) this.image = 2;					//15%
-		if (random > .15 && random < .5 ) this.image = 1;	//35%
-		if (random > .5 && random < .75) this.image = 3;	//25%
-		if (random > .75 && random < 1) this.image = 5;					//25%
+		if (random < .14) this.image = 4;					//15%
+		else if (random > .14 && random < .15 ) this.image =2;	//1%
+		else if (random > .15 && random < .3) this.image = 3;	//35%
+		else if (random > .3 && random < 1) this.image = 1;		//70%
 		Map.tiles += 1;
 	 };
 	Map.data = [];
