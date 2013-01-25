@@ -101,109 +101,121 @@ var init = function() {
 		$(document).bind('keyup.space', game_space_button);
 	 };
 	function game_w_button() {
-		Player.animState = 9;
-		var interval = 25, //ms
-			calls = 0,
-			limit = 1;
-		function moveChar() {
-			if (calls < limit) {
-				if (calls % (1/interval)*2 === 0) {
-					if (Player.animState === 11) {Player.animState = 9;}
-					else Player.animState+=1;
-				 }
-				calls += 1/interval;
-				Player.y -= 1/interval;
-				requestAnimationFrame(moveChar);
-				//moveChar();
-			}
-			else return;
+		if ( Player.checkBounderies() === true || Player.checkBounderies() === "AllowUp" ) {
 
-		 };
-		moveChar();
-		pan_down();
-		Screen.center -= 128;
-		console.log(Screen.center);
-		Screen.select();
+			Player.animState = 9;
+			var interval = 25, //ms
+				calls = 0,
+				limit = 1;
+			function moveChar() {
+				if (calls < limit) {
+					if (calls % (1/interval)*2 === 0) {
+						if (Player.animState === 11) {Player.animState = 9;}
+						else Player.animState+=1;
+					 }
+					calls += 1/interval;
+					Player.y -= 1/interval;
+					requestAnimationFrame(moveChar);
+					//moveChar();
+				}
+				else return;
+
+			 };
+			moveChar();
+			pan_down();
+			Screen.center -= 128;
+			console.log(Screen.center);
+			Screen.select();
+		}
+		else { }
 	};
 	function game_a_button() {
-		Player.animState = 3;
-		var interval = 25, //ms
-			calls = 0,
-			limit = 1;
-		function moveChar() {
-			if (calls < limit) {
-				if (calls % (1/interval)*2 === 0) {
-					if (Player.animState === 5) {Player.animState = 3;}
-					else Player.animState+=1;
-				 }
-				calls += 1/interval;
-				Player.x -= 1/interval;
-				requestAnimationFrame(moveChar);
-				//moveChar();
-			}
-			else return;
-
-		 };
-		moveChar();
-		pan_right();
-		Player.animState = 3;
-		Screen.center -= 1;
-		Screen.select();
+		if ( Player.checkBounderies() === true || Player.checkBounderies() === "AllowLeft"  ) {
+			Player.animState = 3;
+			var interval = 25, //ms
+				calls = 0,
+				limit = 1;
+			function moveChar() {
+				if (calls < limit) {
+					if (calls % (1/interval)*2 === 0) {
+						if (Player.animState === 5) {Player.animState = 3;}
+						else Player.animState+=1;
+					 }
+					calls += 1/interval;
+					Player.x -= 1/interval;
+					requestAnimationFrame(moveChar);
+					//moveChar();
+				}
+				else return;
+			 };
+			moveChar();
+			pan_right();
+			Player.animState = 3;
+			Screen.center -= 1;
+			Screen.select();
+		 }
+		else { };
 	};
 	function game_s_button() {
-		Player.animState = 0;
-		var interval = 25, //ms
-			calls = 0,
-			limit = 1;
-		function moveChar() {
-			if (calls < limit) {
-				if (calls % (1/interval)*2 === 0) {
-						if (Player.animState === 2) {Player.animState = 0;}
-						else Player.animState+=1;
-				 }
-				calls += 1/interval;
-				Player.y += 1/interval;
-				requestAnimationFrame(moveChar);
-					//moveChar();
-			}
-			else return;
+		if ( Player.checkBounderies() === true || Player.checkBounderies() === "AllowDown"  ) {
+			Player.animState = 0;
+			var interval = 25, //ms
+				calls = 0,
+				limit = 1;
+			function moveChar() {
+				if (calls < limit) {
+					if (calls % (1/interval)*2 === 0) {
+							if (Player.animState === 2) {Player.animState = 0;}
+							else Player.animState+=1;
+					 }
+					calls += 1/interval;
+					Player.y += 1/interval;
+					requestAnimationFrame(moveChar);
+						//moveChar();
+				}
+				else return;
 
-		 };
-		moveChar();
-		pan_up();
-		Player.animState = 0;
-		Screen.center += 128;
-		Screen.select();
+			 };
+			moveChar();
+			pan_up();
+			Player.animState = 0;
+			Screen.center += 128;
+			Screen.select();
+		 }
+		else { };
 	};
 	function game_d_button() {
-		Player.animState = 6;
-		var interval = 25, //ms
-			calls = 0,
-			limit = 1;
-		function moveChar() {
-			if (calls < limit) {
-				if (calls % (1/interval)*2 === 0) {
-						if (Player.animState === 8) {Player.animState = 6;}
-						else Player.animState+=1;
-				 }
-				calls += 1/interval;
-				Player.x += 1/interval;
-				requestAnimationFrame(moveChar);
-				//moveChar();
-			}
-			else return;
+		if ( Player.checkBounderies() === true|| Player.checkBounderies() === "AllowRight" ) {
+			Player.animState = 6;
+			var interval = 25, //ms
+				calls = 0,
+				limit = 1;
+			function moveChar() {
+				if (calls < limit) {
+					if (calls % (1/interval)*2 === 0) {
+							if (Player.animState === 8) {Player.animState = 6;}
+							else Player.animState+=1;
+					 }
+					calls += 1/interval;
+					Player.x += 1/interval;
+					requestAnimationFrame(moveChar);
+					//moveChar();
+				}
+				else return;
 
-		 };
-		moveChar();
-		pan_left();
-		Player.animState = 6;
-		Screen.center += 1;
-		Screen.select();
+			 };
+			moveChar();
+			pan_left();
+			Player.animState = 6;
+			Screen.center += 1;
+			Screen.select();
+		 }
+		else { };
 
 	};
 	function game_return_button() {};
 	function game_space_button() {
-		pan(Player.x*0, Player.y*0);
+		pan(Player.x*50, Player.y*50);
 	};
 
 	function pan_up() {
@@ -266,36 +278,38 @@ var init = function() {
 	var imagesLoaded = 0,
 			imageCount = 9,
 			grass1 = new Image(),
-			grass2 = new Image(),
-			grass3 = new Image(),
+			stone = new Image(),
+			boulderWall = new Image(),
+			boulderWall2 = new Image(),
 			grass4 = new Image(),
 			tree1 = new Image(),
 			tree2 = new Image(),
 			hero_img = new Image(),
 			title_logo1 = new Image(),
 			title_logo2 = new Image();
-			skybox = new Image();
+
 
 	grass1.src = "res/world/grass_1.png";
-	grass2.src = "res/world/grass_2.png";
-	grass3.src = "res/world/grass_3.png";
+	stone.src = "res/world/stone.png";
+	boulderWall.src = "res/world/boulderwall.png";
+	boulderWall2.src = "res/world/Vertboulderwall.png";
 	grass4.src = "res/world/grass_4.png";
 	tree1.src = "res/world/tree_1.png";
 	tree2.src = "res/world/tree_2.png";
 	hero_img.src = "res/heros/c1_spritesheet.png";
 	title_logo1.src = "res/title5.png";
 	title_logo2.src = "res/title4.png";
-	skybox.src = "res/world/skybox.png";
 	grass1.addEventListener('load', imageLoad, false);
-	grass2.addEventListener('load', imageLoad, false);
-	grass3.addEventListener('load', imageLoad, false);
+	stone.addEventListener('load', imageLoad, false);
+	boulderWall.addEventListener('load', imageLoad, false);
+	boulderWall2.addEventListener('load', imageLoad, false);
 	grass4.addEventListener('load', imageLoad, false);
 	tree1.addEventListener('load', imageLoad, false);
 	tree2.addEventListener('load', imageLoad, false);
 	hero_img.addEventListener('load', imageLoad, false);
 	title_logo1.addEventListener('load', imageLoad, false);
 	title_logo2.addEventListener('load', imageLoad, false);
-	skybox.addEventListener('load', imageLoad, false);
+
 
 
 
@@ -464,39 +478,48 @@ var init = function() {
 			for (var i = 0, ii = Screen.selected.length; i < ii; i++) {
 
 				ctx.fillStyle = "#337";
-				if (Screen.selected[i].x === 12 || Screen.selected[i].x === 118) {
-					ctx.drawImage(tree2, ( (Screen.selected[i].x)*Map.tileSize), ((Screen.selected[i].y)*Map.tileSize) );
+				if (Screen.selected[i].x === 13 || Screen.selected[i].x === 113) {
+					ctx.drawImage(grass4, ( (Screen.selected[i].x)*Map.tileSize), ((Screen.selected[i].y)*Map.tileSize) );
+					ctx.drawImage(boulderWall2, 0,0, 50,50, ( (Screen.selected[i].x)*Map.tileSize), ((Screen.selected[i].y)*Map.tileSize),50,50 );
 					//ctx.drawImage(tree1, ( (Screen.selected[i].x+1)*Map.tileSize), ((Screen.selected[i].y)*Map.tileSize) );
 					//ctx.fillRect( Screen.selected[i].x*Map.tileSize, Screen.selected[i].y*Map.tileSize, 50, 50);
 				}
-				else if (Screen.selected[i].y === 12 || Screen.selected[i].y === 118) {
-					//ctx.drawImage(tree1, ( (Screen.selected[i].x)*Map.tileSize), ((Screen.selected[i].y)*Map.tileSize) );
+				else if (Screen.selected[i].y === 13 || Screen.selected[i].y === 118) {
+					ctx.drawImage(grass4, ( (Screen.selected[i].x)*Map.tileSize), ((Screen.selected[i].y)*Map.tileSize) );
+					ctx.drawImage(boulderWall, 0,0, 50,50, ( (Screen.selected[i].x)*Map.tileSize), ((Screen.selected[i].y)*Map.tileSize),50,50 );
 				}
-				else if (Screen.selected[i].x < 12 || Screen.selected[i].x > 118) {
-					ctx.drawImage(tree2, ( (Screen.selected[i].x)*Map.tileSize), ((Screen.selected[i].y)*Map.tileSize) );
+				/*
+					else if (Screen.selected[i].x < 13 || Screen.selected[i].x > 113) {
+					ctx.drawImage(grass4, ( (Screen.selected[i].x)*Map.tileSize), ((Screen.selected[i].y)*Map.tileSize) );
 				 }
-				else if (Screen.selected[i].y < 12 || Screen.selected[i].y > 118) {
-					ctx.drawImage(tree2, ( (Screen.selected[i].x)*Map.tileSize), ((Screen.selected[i].y)*Map.tileSize) );
+				else if (Screen.selected[i].y < 13 && Screen.selected[i].y > 11 && Screen.selected[i].x %2 ===0 || Screen.selected[i].y > 118) {
+					ctx.drawImage(grass4, ( (Screen.selected[i].x)*Map.tileSize), ((Screen.selected[i].y)*Map.tileSize) );
+					ctx.drawImage(boulderWall, ( (Screen.selected[i].x)*Map.tileSize), ((Screen.selected[i].y)*Map.tileSize) );
 				 }
-
+				*/
 				//else if (Screen.selected[i].image === 1) ctx.drawImage(tree1, (Screen.selected[i].x)*Map.tileSize, (Screen.selected[i].y-1)*Map.tileSize);
 				else if (Screen.selected[i].image === 2) ctx.drawImage(grass1, Screen.selected[i].x*Map.tileSize, Screen.selected[i].y*Map.tileSize);
 				else ctx.drawImage(grass4, Screen.selected[i].x*Map.tileSize, Screen.selected[i].y*Map.tileSize);
 				
 			 }
 
+
 		};
 		Screen.drawMiddle = function() {
 			for (var i = 0, ii = Screen.selected.length; i < ii; i++) {
 													//drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
-				if (Screen.selected[i].image === 1) ctx.drawImage(tree2, 50, 100, 50, 50, (Screen.selected[i].x)*Map.tileSize, (Screen.selected[i].y)*Map.tileSize, 50, 50);
+
+				if (Screen.selected[i].image === 1) ctx.drawImage(tree2, 50, 100, 50, 50, ((Screen.selected[i].x)*Map.tileSize), ((Screen.selected[i].y)*Map.tileSize), 50, 50);
 				else continue;
 			}
 		};
 		Screen.drawForeground = function() {
 			for (var i = 0, ii = Screen.selected.length; i < ii; i++) {
 												//drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
-				if (Screen.selected[i].image === 1) ctx.drawImage(tree2, 0, 0, 150, 100, (Screen.selected[i].x-1)*Map.tileSize, (Screen.selected[i].y-2)*Map.tileSize, 150, 100);
+					var chance = Math.random();
+					var scaleJitter = 1;
+					if (chance < .08) { scaleJitter = 1 + Math.random()*.02;}
+				if (Screen.selected[i].image === 1) ctx.drawImage(tree2, 0, 0, 150, 100, (Screen.selected[i].x-1)*Map.tileSize, (Screen.selected[i].y-2)*Map.tileSize, 150*scaleJitter, 100*scaleJitter);
 			}
 		};
 		Screen.SetScreenInitially = function() {
@@ -520,7 +543,10 @@ var init = function() {
 		Player.y = 0;
 		Player.isOnTile = 0;
 		Player.spawnTile = 0;
-		Player.set = false;
+		Player.make = function() {
+			Player.make = Function("");
+			new Battle.Hero("Player", "Wanderer");
+		 };
 		Player.animState = 0;
 
 		Player.spawn = function() {
@@ -532,9 +558,19 @@ var init = function() {
 
 		Player.draw = function() {
 		//	drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+		console.log(Player.x, Player.y);
 			ctx.drawImage(hero_img, Player.animState*50, 0, 50, 60, Player.x*50, (Player.y*50), 37, 45);
 
 		};
+		Player.checkBounderies = function() {
+
+			if ((~~Player.x === 14)) {return "AllowRight";}
+			else if ((~~Player.x) === 113) {return "AllowLeft";}
+			else if ((~~Player.y) === 13) {return "AllowDown";}
+			else if ((~~Player.y) === 113) {return "AllowUp";}
+			else {return true;}
+
+		 };
 
 
 
@@ -563,6 +599,22 @@ var init = function() {
 		return gameDelta;
 	};
 
+/**/var Battle = {};
+		Battle.hero = {}; 
+		Battle.hero.list = [];
+		Battle.Hero = function(characterName, classTitle) {
+			this.name = characterName;
+			this.class = classTitle;
+			this.level = 0;
+			data = this;
+			Battle.hero.list.push(data);
+
+
+		 };
+		Battle.hero.make = function(name, className) {
+
+		 };
+
 
 /**/var Game = {};
 		Game.mode = 0;
@@ -578,6 +630,7 @@ var init = function() {
 		Game.arrow = 275;
 		Game.helpText = "Press ENTER to select.";
 		Game.flicker = 0;
+
 		Game.titleScreen = function() {
 
 			titleSetControls();
