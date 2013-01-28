@@ -124,7 +124,7 @@ var init = function() {
 			moveChar();
 			pan_down();
 			Screen.center -= 128;
-			console.log(Screen.center);
+			
 			Screen.select();
 		}
 		else { }
@@ -215,7 +215,7 @@ var init = function() {
 	};
 	function game_return_button() {};
 	function game_space_button() {
-		pan(Player.x*50, Player.y*50);
+		Battle.start();
 	};
 
 	function pan_up() {
@@ -237,7 +237,6 @@ var init = function() {
 	function pan(newX, newY) {
 
 		if ( typeof newY !== "undefined") {
-			console.log("bam!");
 			Screen.moveToX = newX;
 			Screen.moveToY = newY;
 			Screen.x += Screen.moveToX;
@@ -260,7 +259,6 @@ var init = function() {
 		else {
 
 			/* manually setting Screen.moveToX/moveToY then calling pan(); will instantly move the Screen. */
-			console.log("bing!");		
 			Screen.x += Screen.moveToX;
 			Screen.y += Screen.moveToY;
 
@@ -367,9 +365,8 @@ var init = function() {
 		}
 		var result = (new Date() - myDate);
 		Game.loadingText = (Map.tiles + " tiles loaded in " + result + " milliseconds.");
-		//console.log(Map.data);
 
-	/*	 Make an array of map bounderies to check against later */
+	/*	 Make an array of map bounderies to check against later 
 		for (var i = 0, ii = Map.data.length; i < ii; i++) {
 			if (Map.data[i].x === 1 || Map.data[i].x === 2) {
 				Map.edge.push(i);
@@ -383,9 +380,10 @@ var init = function() {
 			else if (Map.data[i].y === 127 || Map.data[i].y === 128) {
 				Map.edge.push(i);
 			}
+
 		}
+		*/
 		Map.made = true;
-		console.log(Map.edge);
 		
 	};
 	Map.draw = function() {
@@ -421,10 +419,10 @@ var init = function() {
 
 			Screen.dimensions.col = columnLength;
 
-			console.log((rowLength*columnLength)/2);
+			///*debug*/ console.log((rowLength*columnLength)/2);
 			Screen.area = rowLength*columnLength;
 
-			/*debug*/	console.log("Center: "+center);
+			///*debug*/	console.log("Center: "+center);
 
 			var bottomRightCorner = (center+(11+Screen.loadMargin))+(Map.width*(8+Screen.loadMargin));
 			if ( bottomRightCorner > 128*128 ) {
@@ -435,7 +433,7 @@ var init = function() {
 				while (bottomRightCorner > 128*128 ) 
 			 }
 
-			/*debug*/	console.log("Bottom Right: "+bottomRightCorner);
+			///*debug*/	console.log("Bottom Right: "+bottomRightCorner);
 			///*debug*/	console.log("Bottom Right X: "+Map.data[bottomRightCorner].x);
 			///*debug*/	console.log("Bottom Right Y: "+Map.data[bottomRightCorner].y);
 			var topLeftCorner = (center-(11+Screen.loadMargin))-(Map.width*(8+Screen.loadMargin));
@@ -448,26 +446,26 @@ var init = function() {
 				 }
 				while (topLeftCorner < 0 ) 
 			 }
-			/*debug*/console.log("Top Left: "+topLeftCorner);
+			///*debug*/console.log("Top Left: "+topLeftCorner);
 			///*debug*/console.log("Top Left X: "+Map.data[topLeftCorner].x);
 
 			for (var i = topLeftCorner, xx = (Map.data[bottomRightCorner].x - Map.data[topLeftCorner].x), counter = 0;  /*i < bottomRightCorner*/ counter < (rowLength*columnLength); i++, counter++) {
 					if ( counter % (xx) === 0  && counter != 0) {
-						console.log("From " + i + " to " + (i+ ( 128 - xx ) ) );
+						//console.log("From " + i + " to " + (i+ ( 128 - xx ) ) );
 						i+=(128 - (xx));
 					 }
 					var data = Map.data[i];
 					Screen.selected.push(data);
-					if (i === Screen.center) {console.log("Center!!! :" + Screen.selected.length);}
+					if (i === Screen.center) { }
 					if (i === bottomRightCorner - (128 - xx) ) break;
 
 				}
 				var centerVal = Screen.selected.length;
-				console.log(Screen.selected.length);
+				//console.log(Screen.selected.length);
 				//console.log("----X:   screen center: " + Map.data[Screen.center].x + " vs centerVal: " + Map.data[centerVal].x + "." );
 				//console.log("----Y:   screen center: " + Map.data[Screen.center].y + " vs centerVal: " + Map.data[centerVal].y + "." );
 			Screen.tilesLoaded = true;
-			console.log(Screen.selected);	
+			//console.log(Screen.selected);	
 		 };
 		Screen.tilesLoaded = false;
 		Screen.loadTiles = function() { };
@@ -558,7 +556,7 @@ var init = function() {
 
 		Player.draw = function() {
 		//	drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
-		console.log(Player.x, Player.y);
+		//console.log(Player.x, Player.y);
 			ctx.drawImage(hero_img, Player.animState*50, 0, 50, 60, Player.x*50, (Player.y*50), 37, 45);
 
 		};
@@ -606,6 +604,20 @@ var init = function() {
 			this.name = characterName;
 			this.class = classTitle;
 			this.level = 0;
+			if (classTitle === "warrior") {
+				this.stats = {
+					str : 15,
+					int : 6,
+					agi : 10
+			 	};
+			 }
+			 if (classTitle === "wizard") {
+				this.stats = {
+					str : 10,
+					int : 25,
+					agi : 5
+			 	};
+			 }
 			data = this;
 			Battle.hero.list.push(data);
 
@@ -614,6 +626,22 @@ var init = function() {
 		Battle.hero.make = function(name, className) {
 
 		 };
+		Battle.start = function() {
+			Game.mode = 3;
+		 };
+		Battle.scene = function() {
+			ctx.fillStyle = "#181818";
+			ctx.fillRect(0,0, canvas.width, canvas.height);
+
+		 };
+		Battle.stepCount = 100;
+		Battle.step = function() {
+			Battle.stepCount-=Math.random()*12;
+			if (Battle.stepCount <= 0) {
+				Battle.stepCount = 100;
+				Battle.start();
+			 }
+		 };
 
 
 /**/var Game = {};
@@ -621,11 +649,12 @@ var init = function() {
 		Game.timer = new Timer();
 		Game.drawScreen = function() {	/*		DrawScreen			*/
 
-			//console.log("drawn");
+			console.log("frame");
 			Game.checkState();
 			if (Game.mode === 0) Game.titleScreen();
 			if (Game.mode === 1) Game.load();
 			if (Game.mode === 2) { gameSetControls(); Game.init();}
+			if (Game.mode === 3) { Battle.scene();}
 		 };
 		Game.arrow = 275;
 		Game.helpText = "Press ENTER to select.";
